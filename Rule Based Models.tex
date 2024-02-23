@@ -81,3 +81,83 @@ Rule extraction methods can be either:
 
 \subsection{Direct Methods for Rule Extraction}
 
+To illustrate how direct methods work, we'll consider a widely-used algorithm called \textbf{RIPPER} (Repeated Incremental Pruning to Produce Error Reduction). This algorithm scales almost linearly with the number of training examples, and is particularly suited for datasets with imbalanced class distributions. It also works well with noisy data, since it uses a validation set to prevent overfitting.
+
+RIPPER uses the \textbf{sequential covering} algorithm to extract rules from data. This algorithm uses a greedy strategy to build rules, one class at a time. For binary problems, the majority class is chosen as the default, and the algorithm learns the rules to detect only the minority class. For multiclass problems, the classes are first ordered by prevalence in the dataset; then, starting from the least prevalent class $y_1$, all elements belonging to it are labeled as positive, while all the rest, belonging to $y_2, y_3, \dots y_c$, are labeled as negative. The sequential covering algorithm learns a set rules that discriminates between these positive and negative classes. Next, all instances in $y_2$ (the second least prevalent class) are labeled as positive, while all instances belonging to $y_3, y_4, \dots y_c$ are labeled as negative, and a new rule set is constructed. This process is repeated until only one class remains, $y_c$, which is designated as the default one.
+
+\begin{algorithm}
+\caption{Sequential covering algorithm.}
+\begin{algorithmic}[1]
+    \State $E$ = TR instances, $A$ = set of attribute-value pairs
+    \State $Y_{\sigma} = \{y_1, y_2, \dots , y_k\}$
+    \State $R = \{ \}$
+
+    \For{each $y \in Y_{\sigma} - \{y_k\}$}
+        \While{stopping cond is False}
+            \State $r \xleftarrow{}$ Learn-One-Rule($E,A,y$)
+            \State Remove TR instances from $E$ that are covered by $r$.
+            \State $R \xleftarrow{} R \lor r$
+        \EndWhile
+    \EndFor
+    \State Insert default rule: $R \xleftarrow{} R \lor (\{\} \xrightarrow{} y_k)$
+\end{algorithmic}
+\end{algorithm}
+
+The algorithm always starts with an empty decision list, $R$, and extracts rules for each class following the ordering specified by their prevalence. The Learn-One-Rule function iteratively extracts all rules for the current class, and all training instances covered by each rule found is removed from $E$. The rule is then added to the bottom to the rule list, and the loop repeats until the specified stopping criterion is met.
+
+\subsubsection{Rule Evaluation}
+
+In the Learn-One-Rule function, the algorithm must search for an optimal rule by growing one in a greedy fashion. It starts with a rule with an empty antecedent, $r : \{ \} \xrightarrow{} +$. Then, new conjuncts are gradually added to the antecedent in order to improve the rule's accuracy.
+
+RIPPER uses the \textbf{FOIL's First Order Inductive Learner) information gain} as the measure to choose which conjunctive to add to the rule's antecedent.
+
+\BoxDef{FOIL's Information Gain}{
+Given $p_0$ and $n_0$ the number of positive and negative examples covered by the original rule, and $p_1$ and $n_1$ the number of positive and negative examples covered by the new rule, the FOIL's information gain is defined as:
+\begin{equation*}
+    FOIL's \ inf. gain = p_1 \times \left( \log_2 \dfrac{p_1}{p_1 + n_1} - \log_2 \dfrac{p_0}{p_0 + n_0} \right)
+\end{equation*}
+}
+RIPPER starts with a rule $r : A \xrightarrow{} +$. It then adds one conjunct, $B$, generating the rule $r : A \land B \xrightarrow{} +$, and the information gain is calculated for this addition. This step is repeated for different conjuncts, and the rule with the highest information gain is chosen to replace the original rule. The function stops once there's no additions that improve the information gain, so the rule covers only positive instances. Additionally, all instances covered by the rule are removed from the training set.
+
+RIPPER also performs pruning of the rules to improve the generalization error based on their performance on a validation set. After generating a rule, the following metric is computed:
+\begin{equation*}
+    v = \dfrac{(p-n)}{(p+n)} \ ,
+\end{equation*}
+where $p$/$n$ are the number of positive/negative validation instances covered by that rule. If this measure improves after removing a conjunct, the latter is permanently pruned, and the measure is again evaluated for the next conjunct. The check follows the reverse order to the one established by the insertion of conjuncts during generation. Note that a pruned rule may cover both positive and negative examples of the training set; this means that the rule is less adapted to the training data, but performs better on unseen examples. 
+
+The generation of rules is interrupted once a stopping condition is verified, such that the complexity of the model is high enough to generalize well, but not so high that it overfits the training data. Some common stopping conditions are evaluated based on the \textbf{Minimum Description Length} (\textbf{MDL}). The MDL measures the cost of a model as:
+\begin{equation*}
+    Cost(M, D) = Cost(D|M) + \alpha \times Cost(M) \ ,
+\end{equation*}
+where $M$ and $D$ are the model and the data, respectively, and $\alpha$ is a tuning hyperparameter (usually set to 0.5).  The first term of the addition encodes the misclassification error, while the second term uses node encoding (number of children) plus encoding of the splitting condition. The cost is evaluated in terms of how many bits are needed to encode the rule set: if the addition of a rule would increase the length of the set by at least $d$ bits, then RIPPER stops adding rules (by default, $d$ is 64 bits). This is a form of Pessimistic Error Estimate, since it evaluates the generalization error of the model as:
+\begin{equation*}
+    R(T) = R_{emp} + \Omega \times \dfrac{k}{l} \ ,
+\end{equation*}
+where $R_{emp}(T)$ is the training error, $\Omega$ is a trade-off hyperparameter that represents the cost of adding a new rule, $k$ is the size of the rule set, and $l$ is the number of training instances.
+
+RIPPER also performs additional optimization steps to determine whether the rules in the set can be replaced by better alternatives. For each rule $r$, two new rules are considered as replacement:
+\begin{itemize}
+    \item A replacement rule $r^*$: a new rule is grown from scratch;
+    \item A revised rule $r'$: conjuncts are added to the rule $r$ to extend it.
+\end{itemize}
+The rule set for $r$ is compared with the rule sets for $r^*$ and $r'$, choosing the rule that minimizes the MDL.
+
+\subsection{Indirect Methods for Rule Extraction}
+
+Indirect methods generate a rule set by using the output of some other model, typically an unpruned decision tree. In a decision tree, each path connecting the root to a leaf can be expressed as a classification rule, where each attribute test condition encountered on the path is a different conjunct of the antecedent, and the (majority) class in the leaf node is the consequent. This section will focus on the approach followed by the algorithm C4.5rules.
+
+A rule is generated from each path in the tree. For each rule $r : A \xrightarrow{} y$ in the rule set, alternative rules $r' : A' \xleftarrow{} y$ are considered, where $A'$ is obtained by removing one of the conjuncts in $A$. The simplified rule with the lowest pessimistic error rate is retained as a replacement if the error rate is also lower than that of the original rule. Eventual duplicates of the new rule are eliminated from the rule set.
+
+After generating the rule set, C4.5rules uses a class-based ordering to rearrange the rules, so that all rules predicting the same class appear close together in the same subset. The description length of each subset is calculated, and the classes are arranged in increasing order of their total description length. This way, the subset with the lowest description length is given priority over the others, since it is assumed to contain the best set of rules.
+
+\section{Characteristics of Rule Based Models}
+
+Rule based classifiers are very similar to decision trees, and have about the same expressiveness. Both models construct rectilinear decision boundaries in the input space, and assign a class to each partition. Rule based classifiers, however, can allow multiple rules to be triggered for the same instance, while in decision trees, each instance can only follow one specific path. Because of this, rule based models can approximate more complex functions.
+
+Like decision trees, they can handle different types of attributes, both continuous and categorical, and can work for both binary and multiclass classification tasks. Additionally, rule based classifiers often produce models that are easier to interpret but have comparable performance to decision trees.
+
+They can also handle redundant attributes, since if two or more highly correlated, only one of them is chosen to be added as a conjunct. Since irrelevant attributes will show poor information gain, rule based models will tend to avoid choosing them as conjuncts. Still, as seen for decision trees, if the problem is sufficiently complex, sometimes irrelevant attributes may be chosen over other more relevant ones that show poor information gain individually, but would be useful when interacting with others.
+
+They cannot handle missing values in the test set, as the positioning of the rules in a rule set follows a specific ordering strategy, so if a test instance is covered by multiple rules they may produce conflicting outputs.
+
+Since RIPPER uses a class-based ordering strategy, emphasizing classes with fewer instances, these models are very well suited for imbalanced class distributions. 
