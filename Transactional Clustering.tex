@@ -139,7 +139,7 @@ TX-Means is a parameter-free transactional clustering algorithm, and is useful t
 \end{algorithm} \\
 The algorithm starts by finding a representative for all objects in the dataset, then enters a loop in which each cluster currently in the queue is split. Each split is either accepted, reinserting the new subpartitions in the queue, or rejected, adding the parent cluster to the result, depending on whether it produces an improvement in the BIC score. Below is the pseudocode for the functions \texttt{getRepr()} and \texttt{bisectBasket()}.
 
-\begin{algorithm}
+\begin{algorithm}[H]
 \caption{\texttt{getRepr} pseudocode.}
 \begin{algorithmic}[1]
     \State $I$ = set of items not shared among all baskets in $B$
@@ -158,8 +158,8 @@ The algorithm starts by finding a representative for all objects in the dataset,
     \EndWhile 
     \State Return $r$
 \end{algorithmic}
-\end{algorithm}
 
+\end{algorithm}
 \begin{algorithm}
 \caption{\texttt{bisectBasket} pseudocode.}
 \begin{algorithmic}[1]
