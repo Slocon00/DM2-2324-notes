@@ -1,0 +1,101 @@
+\chapter{Imbalanced Learning}
+
+Most classification tasks assume that classes are equally represented withing the training set. In reality, it's very common to have a majority (negative) class and a minority (positive) class, of which the latter contains only a small fraction of the training data, since it represents a set of more interesting events/objects. In order to handle imbalanced data, we can follow these approaches:
+\begin{itemize}
+    \item \textbf{Do nothing}: ?
+    \item \textbf{Balance the training set}: the training set is modified, using either under- or oversampling.
+    \item \textbf{Balance at the algorithm level}: the algorithm is modified, adjusting the weight associated to the classes, using a different decision threshold, or using specific algorithms that perform well on imbalanced data.
+    \item \textbf{Switch to Anomaly Detection}: ?
+\end{itemize}
+
+\section{Balancing the Training Set}
+
+\subsection{Undersampling}
+
+\textbf{Undersampling} is done on the majority class to reduce its size and make it comparable to that of the minority class. The simplest way is using \textbf{random undersampling}, with or without replacement, simply randomly selecting elements from the majority class until a set of the desired size is obtained.
+
+Another technique is \textbf{Tomek Links}: it selects pairs of examples $(a,b)$ that respect the following properties:
+\begin{itemize}
+    \item $a$ is the nearest neighbor of $b$;
+    \item $b$ is the nearest neighbor of $a$;
+    \item $a$ and $b$ belong to different classes.
+\end{itemize}
+From this pair, the element belonging to the majority class is removed from the dataset. This way, all samples from the majority class that are very close to those in the minority class (i.e., they're harder to distinguish) can be excluded from the dataset.
+
+\textbf{Edited Nearest Neighbor} works as follows: for each example, it finds its k-nearest neighbors, and checks the predicted class by that neighborhood; if this predicted class does not match the class of the example, it is removed along with the neighborhood. At the end, all examples that were too close to instances of the opposite class will have been removed from the dataset.
+
+\textbf{Condensed Nearest Neighbor} performs a smart undersampling, constructing the subset of records which are able to correctly classify the original data using $k$-NN (typically, $k$ is set to 1). The algorithm operates using these steps:
+\begin{enumerate}
+    \item A random example is extracted and added to \texttt{STORE}. All other records are added to \texttt{GRABBAG}.
+    \item A loop iterates over all other samples in the dataset; for each example, it is classified via $k$-NN using the contents of \texttt{STORE}, and, if the prediction does not match the class label, it is moved to \texttt{STORE}. The loop continues until either \texttt{GRABBAG} becomes empty or a whole pass over it is done without no transfers to \texttt{STORE}.
+    \item Return \texttt{STORE}.
+\end{enumerate}
+
+Finally, undersampling can be done by first performing centroid-based clustering on the data representing the majority class, and then using only the centroids instead of the entire data.
+
+\subsection{Oversampling}
+
+\textbf{Oversampling} the minority class increases the amount of examples belonging to it. Oversampling can also be done with random sampling, with or without replacement, as seen for undersampling.
+
+\textbf{SMOTE} (Synthetic Minority Oversampling TEchnique) oversamples the minority class by adding data points via interpolation. It operates in the feature space, introducing synthetic examples along the segments that connect each sample with any/all of its minority class $k$ nearest neighbors. Depending on the amount of oversampling needed, the value of $k$ can be changed (by default, $k=4$). In practice, interpolation is done by taking the difference between the current sample and one of its neighbors; this difference is multiplied by a random number between 0 and 1, and the result is added to the values of the current sample. The final record represents a point that is somewhere along the segment that connects the sample and the neighbor.
+
+An alternative to SMOTE is \textbf{ADASYN} (ADAptive SYNthetic). This algorithm operates as follows:
+\begin{enumerate}
+    \item The ratio of min to maj class examples is calculated as $d = \#min/\#maj$.
+
+    \item The total number of synthetic minority class examples as $G = (\#maj - \#min) / \beta$, where $\beta$ is the desired ratio of minority.
+
+    \item The $k$-NN of each minority sample is found, and the ratio of majority class examples is found for that neighborhood as $r_i = \#maj_i / k$; this ratio is then normalized by dividing it by the sum of all the $r_i$.
+
+    \item The number of synthetic samples to generate for each neighborhood is calculated as $G_i = G_{r_i}$.
+
+    \item $G_i$ samples are generated for each neighborhood, taking two minority samples $(x_i, y_i)$ within the neighborhood, and interpolating among them (as SMOTE does).
+\end{enumerate}
+
+\section{Balancing at the Algorithm Level}
+
+Another way to handle unbalanced data is to modify the behaviour of the training algorithm to take into account the disparity between the classes. There's two main ways this can be done: using class weights, or adjusting the decision threshold.
+
+The overall performances of a classifier can be summarized using a confusion matrix. A corresponding \textbf{cost matrix} can be constructed, associating a different cost (weight) to each ``event''.
+
+\begin{figure}[H]
+\centering
+\begin{minipage}{0.49\textwidth}
+    \begin{tabular}{|c||c|c|}
+         \hline
+         & pred. + & pred. - \\
+        \hline
+        \hline
+        actual + & $f_{++}$ & $f_{+-}$\\
+        \hline
+        actual - & $f_{-+}$ & $f_{--}$\\
+        \hline
+    \end{tabular}
+\end{minipage}
+\hfill
+\begin{minipage}{0.49\textwidth}
+    \begin{tabular}{|c||c|c|}
+         \hline
+        $C(i|j)$ & pred. + & pred. - \\
+        \hline
+        \hline
+        actual + & $C(+|+)$ & $C(-|+)$\\
+        \hline
+        actual - & $C(+|-)$ & $C(-|-)$\\
+        \hline
+    \end{tabular}
+\end{minipage}
+\caption{Confusion matrix on the left, cost matrix on the right.}
+\end{figure}
+The objective of the training algorithm is to minimize the total cost given by:
+\begin{equation*}
+    \sum_X C_X * freq_X
+\end{equation*}
+There's some classifiers, called \textbf{Meta-Cost Sensitive Classifiers}, that calculate the risk of classifying a certain instance $x$ as class $i$:
+\begin{equation*}
+    R(i|x) = \sum_j P(j|x)C(i,j)
+\end{equation*}
+
+Many classifiers predict what class an instance belongs to by computing scores that represent the probability that the given instance belongs to a class. The score is usually the probability that the instance belongs to the positive/minority class. By default, if the score is greater than 50\%, the instance is predicted as positive, otherwise it is predicted as negative. This schema can be generalized: if the score is greater than some threshold $THR$ the instance is classified as positive, otherwise it is negative. For each possible threshold, we will get a different set of predictions, and all associated metrics change as well (accuracy, precision, recall, etc.).
+
+To monitor how changing this threshold influences the behaviour of the model, it can be useful to study the \textbf{Receiving Operating Curve} of the model, which plots the True Positive Rate against the False Positive Rate for different values of the threshold.
