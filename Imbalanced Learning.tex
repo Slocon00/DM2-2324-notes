@@ -2,10 +2,9 @@
 
 Most classification tasks assume that classes are equally represented withing the training set. In reality, it's very common to have a majority (negative) class and a minority (positive) class, of which the latter contains only a small fraction of the training data, since it represents a set of more interesting events/objects. In order to handle imbalanced data, we can follow these approaches:
 \begin{itemize}
-    \item \textbf{Do nothing}: ?
     \item \textbf{Balance the training set}: the training set is modified, using either under- or oversampling.
     \item \textbf{Balance at the algorithm level}: the algorithm is modified, adjusting the weight associated to the classes, using a different decision threshold, or using specific algorithms that perform well on imbalanced data.
-    \item \textbf{Switch to Anomaly Detection}: ?
+    \item \textbf{Switch to Anomaly Detection}.
 \end{itemize}
 
 \section{Balancing the Training Set}
@@ -41,11 +40,11 @@ Finally, undersampling can be done by first performing centroid-based clustering
 
 An alternative to SMOTE is \textbf{ADASYN} (ADAptive SYNthetic). This algorithm operates as follows:
 \begin{enumerate}
-    \item The ratio of min to maj class examples is calculated as $d = \#min/\#maj$.
+    \item The ratio of min to maj class examples is calculated as $d = \#\textit{min}/\#\textit{maj}$.
 
-    \item The total number of synthetic minority class examples as $G = (\#maj - \#min) / \beta$, where $\beta$ is the desired ratio of minority.
+    \item The total number of synthetic minority class examples as $G = (\#\textit{maj} - \#\textit{min}) / \beta$, where $\beta$ is the desired ratio of minority.
 
-    \item The $k$-NN of each minority sample is found, and the ratio of majority class examples is found for that neighborhood as $r_i = \#maj_i / k$; this ratio is then normalized by dividing it by the sum of all the $r_i$.
+    \item The $k$-NN of each minority sample is found, and the ratio of majority class examples is found for that neighborhood as $r_i = \#\textit{maj}_i / k$; this ratio is then normalized by dividing it by the sum of all the $r_i$.
 
     \item The number of synthetic samples to generate for each neighborhood is calculated as $G_i = G_{r_i}$.
 
@@ -61,6 +60,7 @@ The overall performances of a classifier can be summarized using a confusion mat
 \begin{figure}[H]
 \centering
 \begin{minipage}{0.49\textwidth}
+\centering
     \begin{tabular}{|c||c|c|}
          \hline
          & pred. + & pred. - \\
@@ -74,6 +74,7 @@ The overall performances of a classifier can be summarized using a confusion mat
 \end{minipage}
 \hfill
 \begin{minipage}{0.49\textwidth}
+\centering
     \begin{tabular}{|c||c|c|}
          \hline
         $C(i|j)$ & pred. + & pred. - \\
@@ -89,13 +90,13 @@ The overall performances of a classifier can be summarized using a confusion mat
 \end{figure}
 The objective of the training algorithm is to minimize the total cost given by:
 \begin{equation*}
-    \sum_X C_X * freq_X
+    \sum_X C_X * \textit{freq}_X
 \end{equation*}
 There's some classifiers, called \textbf{Meta-Cost Sensitive Classifiers}, that calculate the risk of classifying a certain instance $x$ as class $i$:
 \begin{equation*}
     R(i|x) = \sum_j P(j|x)C(i,j)
 \end{equation*}
 
-Many classifiers predict what class an instance belongs to by computing scores that represent the probability that the given instance belongs to a class. The score is usually the probability that the instance belongs to the positive/minority class. By default, if the score is greater than 50\%, the instance is predicted as positive, otherwise it is predicted as negative. This schema can be generalized: if the score is greater than some threshold $THR$ the instance is classified as positive, otherwise it is negative. For each possible threshold, we will get a different set of predictions, and all associated metrics change as well (accuracy, precision, recall, etc.).
+Many classifiers predict what class an instance belongs to by computing scores that represent the probability that the given instance belongs to a class. The score is usually the probability that the instance belongs to the positive/minority class. By default, if the score is greater than 50\%, the instance is predicted as positive, otherwise it is predicted as negative. This schema can be generalized: if the score is greater than some threshold \textit{THR} the instance is classified as positive, otherwise it is negative. For each possible threshold, we will get a different set of predictions, and all associated metrics change as well (accuracy, precision, recall, etc.).
 
 To monitor how changing this threshold influences the behaviour of the model, it can be useful to study the \textbf{Receiving Operating Curve} of the model, which plots the True Positive Rate against the False Positive Rate for different values of the threshold.

@@ -1,6 +1,6 @@
 \chapter{Sequential Pattern Mining}
 
-Sequential pattern mining is the discovery of subsequences that frequently appear in a sequential dataset, i.e., finding all the subsequences whose number of occurrences is greater or equal than a user-defined threshold ($minsup$). These frequent subsequences are also called \textbf{sequential patterns}. Unlike frequent itemset mining, sequences also contain spatio-temporal information that specifies when certain transactions happen. Common examples of sequential data may be the purchase history of customers in a supermarket, genome sequences, or web browsing history. 
+Sequential pattern mining is the discovery of subsequences that frequently appear in a sequential dataset, i.e., finding all the subsequences whose number of occurrences is greater or equal than a user-defined threshold (\textit{minsup}). These frequent subsequences are also called \textbf{sequential patterns}. Unlike frequent itemset mining, sequences also contain spatio-temporal information that specifies when certain transactions happen. Common examples of sequential data may be the purchase history of customers in a supermarket, genome sequences, or web browsing history. 
 
 \BoxDef{Sequence, element, event}{
     A sequence $s$ is an \textbf{ordered} list of elements $s = \langle e_1 e_2 \ldots e_n\rangle$. Each element (or ``transaction'') $e_j$ is an \textbf{ordered} list of one or more events (or ``items'') $e_j = \{ i_1, i_2, \ldots , i_m \}$. Each event is a literal.
@@ -29,11 +29,11 @@ Let \textit{D} be a dataset of one or more sequences, called data-sequences. Eac
 
 For the purpose of sequential pattern mining, only a single valid occurrence of a sequence in a data-sequence is considered towards computing support, so even if a subsequence appears in $n$ different ways within the same data-sequence, its support count will only be increased by 1. We can now formally define sequential pattern mining as follows:
 \BoxDef{Sequential Pattern Mining}{
-    Given \textit{D} a dataset of data-sequences, and $minsup$ a user-defined minimum support threshold, the problem of mining sequential patterns
-    is to find all sequences whose support $\geq minsup$; each such sequence is a \textbf{sequential pattern}, also called frequent sequence. 
+    Given \textit{D} a dataset of data-sequences, and \textit{minsup} a user-defined minimum support threshold, the problem of mining sequential patterns
+    is to find all sequences whose support $\geq \textit{minsup}$; each such sequence is a \textbf{sequential pattern}, also called frequent sequence. 
 }
 
-Discovering all frequent sequences in a dataset is a computationally challenging task. The most basic algorithm that solves the problem uses a brute-force approach: generate all possible $k$-sequences for $k = 1,2,3 \ldots$, and compute support for every single one of them. The ones whose support is greater or equal than a $minsup$ threshold are declared frequent. However, the set of all possible candidate sequences is exponentially large and difficult to enumerate, even more than what was seen in association analysis. An event can appear multiple times in different elements within the same sequence, and elements arranged in different orders correspond to different sequences. This means that even when considering a relatively small set of events, the algorithm generates a large set of candidates; e.g., with only three unique events, the candidates generated for size $k = 2$ would be:
+Discovering all frequent sequences in a dataset is a computationally challenging task. The most basic algorithm that solves the problem uses a brute-force approach: generate all possible $k$-sequences for $k = 1,2,3 \ldots$, and compute support for every single one of them. The ones whose support is greater or equal than a \textit{minsup} threshold are declared frequent. However, the set of all possible candidate sequences is exponentially large and difficult to enumerate, even more than what was seen in association analysis. An event can appear multiple times in different elements within the same sequence, and elements arranged in different orders correspond to different sequences. This means that even when considering a relatively small set of events, the algorithm generates a large set of candidates; e.g., with only three unique events, the candidates generated for size $k = 2$ would be:
 \begin{gather*}
     \langle\{i_1\} \{i_1\}\rangle, \langle\{i_1\} \{i_2\}\rangle, \langle\{i_1\} \{i_3\}\rangle, \langle\{i_1 i_2\}\rangle, \langle\{i_1 i_3\}\rangle \\ 
     \langle\{i_2\} \{i_1\}\rangle, \langle\{i_2\} \{i_2\}\rangle, \langle\{i_2\} \{i_3\}\rangle, \langle\{i_2 i_3\}\rangle \\
@@ -56,21 +56,21 @@ A measure $f$ possesses the anti-monotone property if for every itemset $X$ that
 Time constraints control how support is calculated by considering the time elapsed between elements of a sequence. For example, consider a dataset that represents market basket data: each product is an event, each individual purchase is an element, and each data-sequence is a set of purchases made by a customer within some interval of time (months or years). If we're interested in finding a correlation between certain products, we may want to limit the time passed between transactions: if a customer bought product $A$, and then bought product $B$ several months after, then the sequence $\langle \{A\} \{B\} \rangle$ is not significant for the purposes of our analysis. The time constraints are three: \textbf{maxspan}, \textbf{maxgap}, and \textbf{mingap}.
 
 \BoxDef{maxspan}{
-The $maxspan$ constraint specifies the maximum time passed between the first and last element of a sequence. If $t_{i,i+1}$ is the time passed between consecutive elements $i$ and $i+1$ of a data-sequence, then the following inequality must hold true:
+The \textit{maxspan} constraint specifies the maximum time passed between the first and last element of a sequence. If $t_{i,i+1}$ is the time passed between consecutive elements $i$ and $i+1$ of a data-sequence, then the following inequality must hold true:
 
 \begin{equation*}
-	\sum t_{i,i+1} \leq maxspan
+	\sum t_{i,i+1} \leq \textit{maxspan}
 \end{equation*}
 }
 
 \BoxDef{maxgap and mingap}{
-The $maxgap$ and $mingap$ constraints specify the maximum time and minimum time passed between two consecutive elements of a sequence, respectively. If $t_{i,i+1}$ is the time passed between consecutive elements $i$ and $i+1$ of a data-sequence of length $n$, then the following inequality must hold true for $i = 1 \ldots (n-1)$:
+The \textit{maxgap} and \textit{mingap} constraints specify the maximum time and minimum time passed between two consecutive elements of a sequence, respectively. If $t_{i,i+1}$ is the time passed between consecutive elements $i$ and $i+1$ of a data-sequence of length $n$, then the following inequality must hold true for $i = 1 \ldots (n-1)$:
 
 \begin{equation*}
-    mingap < t_{i,i+1} \leq maxgap
+    \textit{mingap} < t_{i,i+1} \leq \textit{maxgap}
 \end{equation*}
 }
-The $maxgap$ constraint violates the Apriori principle. A modification of this principle is used instead, which refers to \textbf{contiguous subsequences}: 
+The \textit{maxgap} constraint violates the Apriori principle. A modification of this principle is used instead, which refers to \textbf{contiguous subsequences}: 
 
 \BoxDef{Contiguous Subsequence}{
 Given a sequence $s = \langle s_1s_2 \ldots s_n \rangle$, a sequence $t$ is a contiguous subsequence of $s$ if:
@@ -94,7 +94,7 @@ the Generalized Sequential Patterns (GSP) algorithm is an efficient algorithm th
 \caption{Generalized Sequential Patterns pseudocode.}
 \begin{algorithmic}[1]
     \State $k=1$.
-    \State $F_k = \{ i : i \in I \land s(i) >= minsup \}$ \# find all frequent 1-sequences
+    \State $F_k = \{ i : i \in I \land s(i) >= \textit{minsup} \}$ \# find all frequent 1-sequences
     \Repeat
         \State $k = k + 1$
         \State $C_k$ = \texttt{candidate-gen}
@@ -108,7 +108,7 @@ the Generalized Sequential Patterns (GSP) algorithm is an efficient algorithm th
             \EndFor
         \EndFor
 
-        \State $F_k = \{ c | c \in C_k \land s(c) \geq minsup \}$ \# find all frequent k-sequences
+        \State $F_k = \{ c | c \in C_k \land s(c) \geq \textit{minsup} \}$ \# find all frequent k-sequences
     \Until{$F_k = \emptyset$}
 \end{algorithmic}
 \end{algorithm}
@@ -134,14 +134,14 @@ A $k$-candidate can be pruned if at least one of its $(k-1)$-subsequences is inf
 
 \subsection{Support Counting}
 
-After the candidate set is pruned, the algorithm iterates over the data-sequences, and for each of them finds which $k$-candidates it contains, increasing their support count accordingly. At the end, all $k$-candidates whose support is less than $minsup$ are discarded, while the rest form the set of frequent $k$-sequences.
+After the candidate set is pruned, the algorithm iterates over the data-sequences, and for each of them finds which $k$-candidates it contains, increasing their support count accordingly. At the end, all $k$-candidates whose support is less than \textit{minsup} are discarded, while the rest form the set of frequent $k$-sequences.
 
 \section{Generalized Sequential Patterns and Time Constraints}
 
-Introducing the $mingap$, $maxgap$, and $maxspan$ time constraints requires the support counting and candidate pruning procedures to be modified. Support counting must now consider the time gap between consecutive elements (for the $mingap$ and $maxgap$ constraints) and the overall span of the sequence (for the $maxspan$ constraint) when determining if a candidate is contained in a sequence. This means that the procedure can't simply determine the first occurrence of a candidate within a data-sequence, but must keep searching for an occurrence that satisfies all three constraints at once, such that $mingap < t_{i,i+1} \leq maxgap$, and $\sum t_{i,i+1} \leq maxspan$, where $t_{i,i+1}$ is the gap between consecutive elements in a data-sequence.
+Introducing the \textit{mingap}, \textit{maxgap}, and \textit{maxspan} time constraints requires the support counting and candidate pruning procedures to be modified. Support counting must now consider the time gap between consecutive elements (for the \textit{mingap} and \textit{maxgap} constraints) and the overall span of the sequence (for the \textit{maxspan} constraint) when determining if a candidate is contained in a sequence. This means that the procedure can't simply determine the first occurrence of a candidate within a data-sequence, but must keep searching for an occurrence that satisfies all three constraints at once, such that $\textit{mingap} < t_{i,i+1} \leq \textit{maxgap}$, and $\sum t_{i,i+1} \leq \textit{maxspan}$, where $t_{i,i+1}$ is the gap between consecutive elements in a data-sequence.
 
-As for candidate pruning, the Apriori principle and anti-monotonicity of support no longer hold true because of the $maxgap$ constraint. If a candidate $c$ is being pruned, and all of its subsequences are checked, some of them may be infrequent, even though the candidate is actually a frequent sequence.
+As for candidate pruning, the Apriori principle and anti-monotonicity of support no longer hold true because of the \textit{maxgap} constraint. If a candidate $c$ is being pruned, and all of its subsequences are checked, some of them may be infrequent, even though the candidate is actually a frequent sequence.
 
-For example, let sequence $s = \langle \{1, 2\} \{2\} \{3\} \{4\} \rangle$ be a data-sequence, and sequence $c = \langle \{1\} \{2\} \{4\} \rangle$ a candidate sequence. If $maxgap = 2$, then $c$ is contained in $s$, but the subsequence $c' = \langle \{1\} \{4\} \rangle$ is not, because the gap between $\{1\}$ and $\{4\}$ is $3$.
+For example, let sequence $s = \langle \{1, 2\} \{2\} \{3\} \{4\} \rangle$ be a data-sequence, and sequence $c = \langle \{1\} \{2\} \{4\} \rangle$ a candidate sequence. If $\textit{maxgap} = 2$, then $c$ is contained in $s$, but the subsequence $c' = \langle \{1\} \{4\} \rangle$ is not, because the gap between $\{1\}$ and $\{4\}$ is $3$.
 
-Therefore, the procedure must check all of a candidate's contiguous subsequences, removing one event at a time only from the elements that contain two events or more. If at least one of the contiguous subsequences of a candidate is infrequent, the candidate can be pruned. This new pruning strategy ensures that no candidate frequent sequences are accidentally discarded, since it skips all the elements that, when removed, could produce a sequence that contains a gap between consecutive elements that violates the $maxgap$ constraint. However, this strategy inevitably decreases the effect that pruning has on the overall execution.
+Therefore, the procedure must check all of a candidate's contiguous subsequences, removing one event at a time only from the elements that contain two events or more. If at least one of the contiguous subsequences of a candidate is infrequent, the candidate can be pruned. This new pruning strategy ensures that no candidate frequent sequences are accidentally discarded, since it skips all the elements that, when removed, could produce a sequence that contains a gap between consecutive elements that violates the \textit{maxgap} constraint. However, this strategy inevitably decreases the effect that pruning has on the overall execution.

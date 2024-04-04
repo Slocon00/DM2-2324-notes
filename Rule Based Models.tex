@@ -2,11 +2,11 @@
 
 A rule based classifier is a model that uses a \textbf{rule set} of ``if-then'' rules to classify instances. Each rule is expressed in the form:
 \begin{equation*}
-    r_i : (Cond_i) \xrightarrow{} y_i.
+    r_i : (\textit{Cond}_i) \rightarrow{} y_i.
 \end{equation*}
 The left side contains a conjunction of attribute test conditions, and is called \textbf{antecedent} or \textbf{precondition}, while the right side represents the predicted class, and is called the \textbf{consequent}. Each condition is defined by a set of $k$ attribute-value pairs, such that:
 \begin{equation*}
-    Cond_i = (A_1 \ op \ v_1) \land (A_2 \ op \ v_2) \land \dots \land (A_k \ op \ v_k) \ ,
+    \textit{Cond}_i = (A_1 \ op \ v_1) \land (A_2 \ op \ v_2) \land \dots \land (A_k \ op \ v_k) \ ,
 \end{equation*}
 where $op$ is a comparison operator. Each attribute test is also known as a \textbf{conjunct}.
 
@@ -30,13 +30,13 @@ A rule $r$ \textbf{covers} an instance $x$ if the attributes of the instance sat
     \caption{Small example dataset.}
     \label{tab:small_dataset}
 \end{table}
-\\The rule $(Can Fly = Y) \land (Gives Birth = N) \xrightarrow{} Bird$ covers the instance ``Owl''.
+\\The rule $(\text{Can Fly} = Y) \land (\text{Gives Birth} = N) \rightarrow{} \text{Bird}$ covers the instance ``Owl''.
 
 The \textbf{coverage} of a rule is the fraction of records in the whole dataset that are covered by it. The \textbf{accuracy} (sometimes called \textbf{precision}) of a rule is the fraction of records in the dataset that satisfy the antecedent that also satisfy the consequent.
 \BoxDef{Coverage and Accuracy}{
 \begin{align*}
-    &Coverage(r) = \dfrac{|A|}{|D|} \\\\
-    &Accuracy(r) = \dfrac{|A \cap y|}{|A|}
+    &\textit{Coverage}(r) = \dfrac{|A|}{|D|} \\\\
+    &\textit{Accuracy}(r) = \dfrac{|A \cap y|}{|A|}
 \end{align*}
 }
 
@@ -44,11 +44,11 @@ The \textbf{coverage} of a rule is the fraction of records in the whole dataset 
 
 A rule based classifier classifies a test instance based on the rule triggered by the instance. Looking at the dataset pictured in Table \ref{tab:small_dataset}, assume we obtained the following rule set from a training set:
 \begin{align*}
-    &r_1 : (Can Fly = Y) \xrightarrow{} Bird \\
-    &r_2 : (Gives Birth = Y) \land (Blood Type = W) \xrightarrow{} Mammal \\
-    &r_3 : (Blood Type = C) \xrightarrow{} Reptile
+    &r_1 : (\text{Can Fly} = Y) \rightarrow{} \text{Bird} \\
+    &r_2 : (\text{Gives Birth} = Y) \land (\text{Blood Type} = W) \rightarrow{} \text{Mammal} \\
+    &r_3 : (\text{Blood Type} = C) \rightarrow{} \text{Reptile}
 \end{align*}
-The instance Owl triggers the first rule, and is therefore classified as a $Bird$. The Bat triggers both the first and the second rule, which produce conflicting outcomes. None of the rules cover the example Platypus, so there's no immediate way to assign a class to this animal. The following section will explain how these issues can be solved.
+The instance Owl triggers the first rule, and is therefore classified as a Bird. The Bat triggers both the first and the second rule, which produce conflicting outcomes. None of the rules cover the example Platypus, so there's no immediate way to assign a class to this animal. The following section will explain how these issues can be solved.
 
 \section{Properties of a Rule Set}
 
@@ -94,12 +94,12 @@ RIPPER uses the \textbf{sequential covering} algorithm to extract rules from dat
 
     \For{each $y \in Y_{\sigma} - \{y_k\}$}
         \While{stopping cond is False}
-            \State $r \xleftarrow{}$ Learn-One-Rule($E,A,y$)
+            \State $r \leftarrow{}$ Learn-One-Rule($E,A,y$)
             \State Remove TR instances from $E$ that are covered by $r$.
-            \State $R \xleftarrow{} R \lor r$
+            \State $R \leftarrow{} R \lor r$
         \EndWhile
     \EndFor
-    \State Insert default rule: $R \xleftarrow{} R \lor (\{\} \xrightarrow{} y_k)$
+    \State Insert default rule: $R \leftarrow{} R \lor (\{\} \rightarrow{} y_k)$
 \end{algorithmic}
 \end{algorithm}
 
@@ -107,17 +107,17 @@ The algorithm always starts with an empty decision list, $R$, and extracts rules
 
 \subsubsection{Rule Evaluation}
 
-In the Learn-One-Rule function, the algorithm must search for an optimal rule by growing one in a greedy fashion. It starts with a rule with an empty antecedent, $r : \{ \} \xrightarrow{} +$. Then, new conjuncts are gradually added to the antecedent in order to improve the rule's accuracy.
+In the Learn-One-Rule function, the algorithm must search for an optimal rule by growing one in a greedy fashion. It starts with a rule with an empty antecedent, $r : \{ \} \rightarrow{} +$. Then, new conjuncts are gradually added to the antecedent in order to improve the rule's accuracy.
 
 RIPPER uses the \textbf{FOIL's First Order Inductive Learner) information gain} as the measure to choose which conjunctive to add to the rule's antecedent.
 
 \BoxDef{FOIL's Information Gain}{
 Given $p_0$ and $n_0$ the number of positive and negative examples covered by the original rule, and $p_1$ and $n_1$ the number of positive and negative examples covered by the new rule, the FOIL's information gain is defined as:
 \begin{equation*}
-    FOIL's \ inf. gain = p_1 \times \left( \log_2 \dfrac{p_1}{p_1 + n_1} - \log_2 \dfrac{p_0}{p_0 + n_0} \right)
+    \textit{FOIL's inf. gain} = p_1 \times \left( \log_2 \dfrac{p_1}{p_1 + n_1} - \log_2 \dfrac{p_0}{p_0 + n_0} \right)
 \end{equation*}
 }
-RIPPER starts with a rule $r : A \xrightarrow{} +$. It then adds one conjunct, $B$, generating the rule $r : A \land B \xrightarrow{} +$, and the information gain is calculated for this addition. This step is repeated for different conjuncts, and the rule with the highest information gain is chosen to replace the original rule. The function stops once there's no additions that improve the information gain, so the rule covers only positive instances. Additionally, all instances covered by the rule are removed from the training set.
+RIPPER starts with a rule $r : A \rightarrow{} +$. It then adds one conjunct, $B$, generating the rule $r : A \land B \rightarrow{} +$, and the information gain is calculated for this addition. This step is repeated for different conjuncts, and the rule with the highest information gain is chosen to replace the original rule. The function stops once there's no additions that improve the information gain, so the rule covers only positive instances. Additionally, all instances covered by the rule are removed from the training set.
 
 RIPPER also performs pruning of the rules to improve the generalization error based on their performance on a validation set. After generating a rule, the following metric is computed:
 \begin{equation*}
@@ -127,7 +127,7 @@ where $p$/$n$ are the number of positive/negative validation instances covered b
 
 The generation of rules is interrupted once a stopping condition is verified, such that the complexity of the model is high enough to generalize well, but not so high that it overfits the training data. Some common stopping conditions are evaluated based on the \textbf{Minimum Description Length} (\textbf{MDL}). The MDL measures the cost of a model as:
 \begin{equation*}
-    Cost(M, D) = Cost(D|M) + \alpha \times Cost(M) \ ,
+    \textit{Cost}(M, D) = \textit{Cost}(D|M) + \alpha \times \textit{Cost}(M) \ ,
 \end{equation*}
 where $M$ and $D$ are the model and the data, respectively, and $\alpha$ is a tuning hyperparameter (usually set to 0.5).  The first term of the addition encodes the misclassification error, while the second term uses node encoding (number of children) plus encoding of the splitting condition. The cost is evaluated in terms of how many bits are needed to encode the rule set: if the addition of a rule would increase the length of the set by at least $d$ bits, then RIPPER stops adding rules (by default, $d$ is 64 bits). This is a form of Pessimistic Error Estimate, since it evaluates the generalization error of the model as:
 \begin{equation*}
@@ -146,7 +146,7 @@ The rule set for $r$ is compared with the rule sets for $r^*$ and $r'$, choosing
 
 Indirect methods generate a rule set by using the output of some other model, typically an unpruned decision tree. In a decision tree, each path connecting the root to a leaf can be expressed as a classification rule, where each attribute test condition encountered on the path is a different conjunct of the antecedent, and the (majority) class in the leaf node is the consequent. This section will focus on the approach followed by the algorithm C4.5rules.
 
-A rule is generated from each path in the tree. For each rule $r : A \xrightarrow{} y$ in the rule set, alternative rules $r' : A' \xleftarrow{} y$ are considered, where $A'$ is obtained by removing one of the conjuncts in $A$. The simplified rule with the lowest pessimistic error rate is retained as a replacement if the error rate is also lower than that of the original rule. Eventual duplicates of the new rule are eliminated from the rule set.
+A rule is generated from each path in the tree. For each rule $r : A \rightarrow{} y$ in the rule set, alternative rules $r' : A' \leftarrow{} y$ are considered, where $A'$ is obtained by removing one of the conjuncts in $A$. The simplified rule with the lowest pessimistic error rate is retained as a replacement if the error rate is also lower than that of the original rule. Eventual duplicates of the new rule are eliminated from the rule set.
 
 After generating the rule set, C4.5rules uses a class-based ordering to rearrange the rules, so that all rules predicting the same class appear close together in the same subset. The description length of each subset is calculated, and the classes are arranged in increasing order of their total description length. This way, the subset with the lowest description length is given priority over the others, since it is assumed to contain the best set of rules.
 

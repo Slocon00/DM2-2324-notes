@@ -1,0 +1,114 @@
+\chapter{Dimensionality Reduction}
+
+Dimensionality reduction is the process of reducing the number of variables in the dataset, obtaining a set of \textbf{principal variables}. Approaches for dimensionality reduction can be divided into feature selection and feature projection.
+
+\section{Feature Selection}
+
+\textbf{Feature selection} extracts a subset of the variables via different strategies: \begin{itemize}
+    \item \textbf{Filter strategy}: the relevance of each feature is evaluated using some appropriate measure (e.g., Information Gain), removing the ones whose corresponding value falls below a given threshold. Commonly, a variance threshold is used. By default, it removes all zero-variance features, meaning the ones that have a constant value. Another technique is Univariate Feature Selection, which selects the best features based on univariate statistical tests. An example of statistical test is the ANOVA F-Value between dependent and independent variables:
+    \begin{equation*}
+        \textit{F-value} = \dfrac{\sum_{i=1}^K n_i(\bar{Y}_i - \bar{Y})^2 / (K-1)}{\sum_{i=1}^K \sum_{j=1}^{n_i} (Y_{ij} - \bar{Y}_i)^2 / (N-K)} \,,
+    \end{equation*}
+    where $Y_i$ is the sample mean over the $i^{th}$ group, $n_i$ is the number of observations in the $i{th}$ group, $\bar{Y}$ is the overall mean, $Y_{ij}$ is the $j^{th}$ observation in the $i^{th}$ out of $K$ groups, and $K$ and $N$ are the number of groups and the sample size, respectively. The F-value is large when the numerator is large, which is unlikely if the population means of the groups have the same value;
+
+    \item \textbf{Wrapper strategy}: the performances of different subsets of features are compared using a model (e.g. a classifier of which we evaluate accuracy), and the subset that yields the best result is selected. An example is Recursive Feature Elimination (RFE), which selects features by recursively considering smaller and smaller sets of features: first, an estimator is trained on the data, and the ``importance'' of each feature is returned. The least important features are pruned from the current set in a recursive fashion, until the desired number of features to select is reached.
+
+    \item \textbf{Embedded strategy}: feature selection is done at the algorithm level, where parameters are modified and appropriate weights are assigned to each feature.
+\end{itemize}
+
+\section{Feature Projection}
+
+\textbf{Feature projection} transforms the features via either linear or non-linear transformations. The most common approaches include:
+\begin{itemize}
+    \item Principal Component Analysis (PCA) and Singular Value Decomposition (SVD);
+    
+    \item Multidimensional Scaling (Sammon maps, ISOMAP, t-SNE);
+
+    \item Non-negative Matrix Factorization (NMF);
+
+    \item Linear Discriminant Analysis (LDA);
+
+    \item Autoencoders.
+\end{itemize}
+
+\subsection{Principal Component Analysis (PCA)}
+
+The goal of \textbf{Principal Component Analysis} is to find a new set of attributes that better capture the variability of the data; the first dimension is chosen as the one that captures as much of the variability as possible, the second one as the dimension that is orthogonal (uncorrelated) to the first and also captures the most of the remaining variability in the data, and so on until the number of desired dimensions is reached. These dimensions are obtained via linear transformations of the original attributes. The steps of PCA are the following:
+\begin{enumerate}
+    \item The dataset $X$ is standardized.
+    
+    \item The mean value of data is calculated across each dimension.
+    
+    \item The covariance matrix of all pairs of features is calculated; given a matrix of data $X$, the mean of each column is removed from the column vectors to get the centered matrix $C$, and so the covariance matrix of the row vectors of $X$ is calculated as $\Sigma = C^TC$.
+    
+    \item The eigenvalues and eigenvectors of $\Sigma$ are found, and the $k$ eigenvectors corresponding to the largest eigenvalues are chosen.
+    
+    \item The original dataset is transformed using the eigenvectors found in the previous step as the new axes.
+\end{enumerate}
+Once the dataset has been transformed, any reconstruction will have some error.
+
+The covariance matrix is used to store the covariance between each pair of attributes in the dataset. The diagonal of the matrix contains the variance of each attribute (since the covariance of a variable with itself is its variance). Since this matrix is symmetric, its eigenvectors are guaranteed to be orthonormal.
+
+In order to compute the eigenvalues and eigenvectors of the covariance matrix, \textbf{Singular Value Decomposition} is often used. A matrix $A \in R^{m \times n}$ can be written as:
+\begin{equation*}
+    A = U \Sigma V^T \,,
+\end{equation*}
+where $\Sigma$ is the diagonal of $A$, and the columns of $V$ are the eigenvectors of the covariance matrix, sorted from largest to smallest eigenvalues.
+
+\subsection{Multi-Dimensional Scaling (MDS)}
+
+Given a pairwise dissimilarity matrix, the goal of MDS is to learn a mapping of data into a lower dimensional space such that the relative distances are preserved. These methods are used to map data to very low configurations (e.g., 2 or 3 dimensions).
+
+The key steps of MDS are the following:
+\begin{enumerate}
+    \item Given a pairwise dissimilarity matrix $D$, and the dimensionality $k$, find a mapping such that $d_{ij} = \|x_i - x_j\|$ for all points in $D$.
+
+    \item The function
+    \begin{equation*}
+        J(x) = \sum_{i=1}^n \sum_{j=1}^n d_1 (d_{ij}, d_2(x_i, x_j))
+    \end{equation*}
+    is minimized, usually via a gradient descent algorithm, solving the associated optimization problem.
+\end{enumerate}
+Depending on the distances used, the approach will return a different result. Classic MDS uses Euclidean distances for every calculation, Metric-MDS uses metrics as distances, and Non-Metric-MDS uses ranks of distances instead of their values.
+
+\textbf{Sammon Mapping} is an algorithm that, similarly to MDS, maps the data to a lower dimensional space while trying to preserve relative distances. It can be seen as a generalization of Metric-MDS. It introduces a weighting system that normalizes the squared errors in pairwise distances using the distance in the original space:
+\begin{equation*}
+    J(x) = \sum_{i=1}^n \sum_{j=1}^n \dfrac{d_1 (d_{ij}, d_2(x_i, x_j))}{d_{ij}}
+\end{equation*}
+As a consequence, Sammon Mapping preserves the small $d_{ij}$, making them more ``important'' in the fitting procedure than larger distances. In general, Sammon mapping better preserves inter-distances for smaller dissimilarities, and proportionally squeezes the inter-distances for larger dissimilarities.
+
+\textbf{ISOmetric Feature MAPping} (\textbf{ISOMAP}) is used for dimensionality reduction when the data points have a complicated, non-linear relationship to one another; it preserves the intrinsic geometry of the data. The basic ISOMAP algorithm is:
+\begin{enumerate}
+    \item For each data point, the nearest neighbors are found using Euclidean distance. These neighborhood relationships are represented as a weighted graph $G$, where each link between nodes $u$ and $v$ has a weight that corresponds to the distance between $u$ and $v$.
+
+    \item The geodesic distance between all pairs of points on the data manifold is calculated by computing the shortest path distances on the graph $G$.
+
+    \item An embedding of the data in a $k$-dimensional Euclidean space is constructed. This embedding is the one that best preserves the manifold geometry.
+\end{enumerate}
+
+\textbf{t-Distributed Stochastic Neighbor Embedding} (\textbf{t-SNE}) is mostly used for data visualization. While PCA tries to find a global structure, t-SNE tries to preserve local structure, i.e., distances and neighbors are preserved by the mapping. SNE encodes high dimensional neighborhood information as a distribution.
+
+For each input data point $x_i$, imagine we have a Gaussian distribution centered around it. The probability that $x_i$ chooses another data point $x_j$ as its neighbor is proportional with the density under this Gaussian: if the standard deviation is high this probability is low, and vice-versa. This probability is calculated as:
+\begin{equation*}
+    p_{j|i} = \dfrac{e^{-\frac{\|x_i - x_j\|^2}{2 \sigma_i^2}}}{\sum_{k \neq i} e^{-\frac{\|x_i - x_k\|^2}{2 \sigma_i^2}}}
+\end{equation*}
+The final distribution over pairs is symmetrized: $p_{ij} = 1 / 2N(p_{ij} + p_{ji})$. For each distribution $p_{j|i}$, we define the \textbf{perplexity}:
+\begin{equation*}
+    \textit{perp}(p_{j|i}) = 2^{H(p_{j|i})} \,,
+\end{equation*}
+where $H(p)$ is the entropy. If the distribution is uniform over $k$ elements, the perplexity is $k$; if the perplexity is low, the sigma is small, while if the perplexity is high the sigma is large.
+
+The objective of SNE can be defined as: given a dataset $x_1, \dots, x_n \in R^m$, defined the distribution $p_{ij}$, find a good embedding $y_1, \dots, y_n \in R^k, k < m$, such that
+\begin{equation*}
+    q_{j|i} = \dfrac{e^{-\|y_i - y_j\|^2}}{\sum_{k \neq i} e^{-\|y_i - y_k\|^2}}
+\end{equation*}
+is optimized to be the closest possible to $p$, minimizing the \textbf{KL-divergence}. KL-divergence measures the distance between two distributions $P$ and $Q$, as:
+\begin{equation*}
+    C = \sum_i KL(P_i | Q_i) = \sum_i \sum_j p_{j|i} \log(\frac{p_{j|i}}{q_{j|i}})
+\end{equation*}
+This is not a metric function, since it's not symmetric. It measures the penalty for using a wrong distribution, and is usually minimized using gradient descent. This is not a convex problem, so there's no guarantee an optimum will be reached, but multiple restarts can be done attempt at finding a good enough solution.
+
+The peculiarity of t-SNE is that for $Q$, instead of using a Gaussian distribution, it uses a heavy tailed distribution:
+\begin{equation*}
+    q_{ij} = \dfrac{(1 + \|y_i - y_j\|^2)^{-1}}{\sum_{k \neq l} (1 + \|y_k - y_l\|^2)^{-1}}
+\end{equation*}

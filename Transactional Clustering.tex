@@ -108,7 +108,7 @@ Higher ratios of height/width mean higher item overlapping.
 
 The goodness of a clustering is calculated as the \textbf{gradient} of each cluster:
 \begin{equation*}
-    Profit_r(C) = \dfrac{\sum_{i=1}^k \dfrac{S(C_i)}{W(C_i)^r} \times |C_i|}{\sum_{i=1}^k |C_i|}
+    \textit{Profit}_r(C) = \dfrac{\sum_{i=1}^k \dfrac{S(C_i)}{W(C_i)^r} \times |C_i|}{\sum_{i=1}^k |C_i|}
 \end{equation*}
 The hyperparameter $r$ is called \textbf{repulsion}; for higher values of $r$, transactions within the same cluster must share a large portion of items, while for lower values transactions may share a lower amount of items, which can be useful for sparse databases.
 
@@ -127,7 +127,7 @@ TX-Means is a parameter-free transactional clustering algorithm, and is useful t
         \State $C, r$ are extracted from $Q$
         \State Common items are removed from $C$ and $r$
         \State $C1,C2,r1,r2$ = \texttt{bisectBasket}($C$)
-        \If{$BIC(C1,C2,r1,r2) > BIC(C,r)$}
+        \If{$\textit{BIC}(C1,C2,r1,r2) > \textit{BIC}(C,r)$}
             \State Add $C1,C2,r1,r2$ to $Q$
         \Else
             \State Add $C, r$ to result 
@@ -163,14 +163,14 @@ The algorithm starts by finding a representative for all objects in the dataset,
 \begin{algorithm}
 \caption{\texttt{bisectBasket} pseudocode.}
 \begin{algorithmic}[1]
-    \State $SSE = \inf$
+    \State $\textit{SSE} = \inf$
     \State Select two random baskets $r1,r2$
     \While{True}
         \State $C1,C2$ = clusters obtained by assigning baskets to either $r1$ or $r2$
         \State $r1_{new}$ = \texttt{getRepr}($C1$)
         \State $r2_{new}$ = \texttt{getRepr}($C2$)
-        \State $SSE_{new} = SSE(C1,C2,r1_{new},r2_{new})$
-        \If{$SSE_{new} \geq SSE$}
+        \State $\textit{SSE}_{new} = \textit{SSE}(C1,C2,r1_{new},r2_{new})$
+        \If{$\textit{SSE}_{new} \geq \textit{SSE}$}
             \State Return $C1,C2,r1,r2$
         \EndIf
         \State $r1 = r1_{new}$

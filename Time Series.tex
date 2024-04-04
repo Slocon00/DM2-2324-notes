@@ -22,7 +22,7 @@ Especially when analyzing long time series, similarity is calculated on a struct
 
 A measure used to calculate structural dissimilarity is \textbf{compression based dissimilarity}, which is calculated as:
 \begin{equation*}
-    d(x,y) = CDM(x,y) = \dfrac{C(x,y)}{C(x) + C(y)} \,,
+    d(x,y) = \textit{CDM}(x,y) = \dfrac{C(x,y)}{C(x) + C(y)} \,,
 \end{equation*}
 where $C$ is a compression algorithm. The numerator is the compression of the concatenation of the two series, while the denominator is the sum of the compressions of the series done singularly: the Compression Dissimilarity Measure equal to 1 if the two series are unrelated, otherwise it is less than one. The smaller its value, the closer the series are to each other. CDM is never zero.
 
@@ -30,9 +30,9 @@ where $C$ is a compression algorithm. The numerator is the compression of the co
 
 Shape-based similarities can be calculated using distance measures. Recall that distances have the following properties:
 \begin{align*}
-    &d(a,b) \geq 0, d(a,b) = 0 \iff a = b \ (Positivity) \\
-    &d(a,b) = d(b,a) \ (Symmetry) \\
-    &d(a,c) \leq d(a,b) + d(b,c)
+    &d(a,b) \geq 0, d(a,b) = 0 \iff a = b \ (\text{Positivity}) \\
+    &d(a,b) = d(b,a) \ (\text{Symmetry}) \\
+    &d(a,c) \leq d(a,b) + d(b,c) (\text{Triangle Inequality})
 \end{align*}
 One way to calculate shape-based dissimilarity is using Euclidean distance. Given two time series (with the same exact number of points/measurements), the Euclidean distance is calculated as if the series were points in an Euclidean space. However, this distance is very sensitive to distortions in the data, which should be removed in a preprocessing phase.\\
 The most common distortions are:
