@@ -97,7 +97,7 @@ the Generalized Sequential Patterns (GSP) algorithm is an efficient algorithm th
     \State $F_k = \{ i : i \in I \land s(i) >= \textit{minsup} \}$ \# find all frequent 1-sequences
     \Repeat
         \State $k = k + 1$
-        \State $C_k$ = \texttt{candidate-gen}
+        \State $C_k$ = \texttt{candidate-gen}($F_{k-1}$)
         \State $C_k$ = \texttt{candidate-prune}($C_k$, $F_{k-1}$)
 
         \For{all $t \in T$}
