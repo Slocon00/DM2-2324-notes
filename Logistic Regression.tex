@@ -1,0 +1,31 @@
+\chapter{Logistic Regression}
+
+Logistic regression is the task of finding a model that represents the log-odds of an event, used for binary classification problems. The function used by the model is called \textbf{logistic function}, which converts the log-odds of a point to the probability of it being labeled 0 or 1. The model is fitted to the data by maximum likelihood estimation.
+
+The idea is to model the probability using a linear function, written as:
+\begin{equation*}
+    f(x_i) = \beta_1 x_i + \beta_0
+\end{equation*}
+where $\beta_0$ and $\beta_1$ are regression coefficients. Since the value returned by this function for each $x_i$ is its corresponding log-odds, we can write the following equation:
+\begin{gather*}
+    \ln \left (\dfrac{p}{1-p} \right ) = \beta_1 x_i + \beta_0 \\
+    \iff \\
+    \dfrac{p}{1-p} = e^{\beta_1 x_i + \beta_0} \\
+    \iff \\
+    p = e^{\beta_1 x_i + \beta_0} - p e^{\beta_1 x_i + \beta_0} \\
+    \iff \\
+    p + p e^{\beta_1 x_i + \beta_0} = e^{\beta_1 x_i + \beta_0} \\
+    \iff \\
+    p (1 + e^{\beta_1 x_i + \beta_0}) = e^{\beta_1 x_i + \beta_0} \\
+    \iff \\
+    \boxed{p = \dfrac{e^{\beta_1 x_i + \beta_0}}{1 + e^{\beta_1 x_i + \beta_0}} = \dfrac{1}{1 + e^{-(\beta_1 x_i + \beta_0)}}}
+\end{gather*}
+So, for a set of given values for the model's parameters, its \textbf{likelihood} is calculated as:
+\begin{equation*}
+    \mathcal{L}_n(\beta_0, \beta_1; x) = \prod_{i: y_i = 1} f(x_i) * \prod_{j: y_i = 0}^{l-k} 1 - f(x_j)
+\end{equation*}
+i.e., it's the product of the likelihoods of each data point. In practice, the \textbf{log-likelihood} is used instead:
+\begin{equation*}
+    l(\beta_0, \beta_1; x) = \sum_{i: y_i = 1} \ln(f(x_i)) + \sum_{j: y_j = 0} \ln(1 - f(x_i))
+\end{equation*}
+The likelihood is calculated for different parameters, gradually increasing it until it finds the optimal fit.

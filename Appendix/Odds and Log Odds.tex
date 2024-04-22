@@ -1,0 +1,33 @@
+\chapter{Odds and Log Odds}
+
+Given an event with probability $p$, the \textbf{odds} of that even occurring are:
+\begin{equation*}
+    \textit{odds} = \dfrac{p}{1-p}
+\end{equation*}
+The \textbf{log-odds} of that event occurring are:
+\begin{equation*}
+    \ln \left(\dfrac{p}{1-p} \right)
+\end{equation*}
+An \textbf{odds ratio} is a statistic that quantifies the strength of the association between two events $x$ and $y$, and is calculated as the ratio of the odds of the to events:
+\begin{equation*}
+    \textit{odds ratio} = \dfrac{\dfrac{p_x}{1-p_x}}{\dfrac{p_y}{1-p_y}}
+\end{equation*}
+For example, consider the following contingency table:
+\begin{center}
+\begin{tblr}{
+hline{1-2}={3-4}{1pt},
+hline{3-5}={1-4}{1pt}, 
+vline{3-5}={1-4}{1pt},
+vline{1-2}={3-4}{1pt},
+colspec = {cccc}}
+    & & \SetCell[c=2]{c} Has Cancer & \\
+    & & Yes & No \\
+    \SetCell[r=2]{c} Has Mutation & Yes & 23 & 117 \\
+    & No & 6 & 210 \\
+\end{tblr}
+\end{center}
+We want to know if there is a relationship between the presence of a mutated gene and cancer. The odds ratio is:
+\begin{equation*}
+    \dfrac{\dfrac{23}{117}}{\dfrac{6}{210}} = \dfrac{0.2}{0.03} = 6.88
+\end{equation*}
+The result tells us that if someone has a mutated gene, the odds of having cancer are 6.88 higher than for those who do not have a mutation.

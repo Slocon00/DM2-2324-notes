@@ -1,0 +1,18 @@
+\chapter{Maximum Likelihood Estimation}
+
+Maximum Likelihood Estimation is a method used to determine values for the parameters of a model, such that they maximize the likelihood that the process described by the model produces the observed data. This is done by maximizing a likelihood function, so that the observed data is most probable.
+
+The dataset is modeled as a random sample $x = [x_1, x_2, \dots, x_n]$ of i.i.d. points, taken from an unknown joint probability distribution, expressed in terms of parameters $\theta = [\theta_1, \theta_2, \dots, \theta_k]^T$, so that the distribution falls within the set $\{f(\cdot; \theta) | \theta \in \Theta \}$, where $\Theta$ is the parameter space. Evaluating the joint density at $x$ is
+\begin{equation*}
+    \mathcal{L}_n(\theta) = \mathcal{L}_n(\theta; x) = f_n(x;\theta) = \prod_{i=1}^n f_n(x_i;\theta)
+\end{equation*}
+called the likelihood function. The goal is to find the $\theta$ which maximizes it:
+\begin{equation*}
+    \theta = \arg \max_{\theta \in \Theta} f_n(x;\theta)
+\end{equation*}
+Since this maximum is found by differentiation, it is often convenient to use the natural logarithm of the likelihood function, called \textbf{log-likelihood}:
+\begin{equation*}
+    l(\theta;x) = \ln \mathcal{L}_n (\theta;x)
+\end{equation*}
+
+Sometimes there's known estimators for the parameters; for example, when assuming a Gaussian distribution, the $\mu$ parameter is estimated as the arithmetic mean of the available observations.
