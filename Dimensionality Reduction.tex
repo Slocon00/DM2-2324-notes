@@ -20,6 +20,8 @@ Dimensionality reduction is the process of reducing the number of variables in t
 
 \textbf{Feature projection} transforms the features via either linear or non-linear transformations. The most common approaches include:
 \begin{itemize}
+    \item Random Subspace Projection;
+
     \item Principal Component Analysis (PCA) and Singular Value Decomposition (SVD);
     
     \item Multidimensional Scaling (Sammon maps, ISOMAP, t-SNE);
@@ -30,6 +32,7 @@ Dimensionality reduction is the process of reducing the number of variables in t
 
     \item Autoencoders.
 \end{itemize}
+Random Subspace Projection is a very simple approach: the data is projected into low-dimensional space using a random matrix whose columns have unit length. It preserves the structure of the data, and is computationally cheap.
 
 \subsection{Principal Component Analysis (PCA)}
 
