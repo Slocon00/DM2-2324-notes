@@ -1,0 +1,83 @@
+\chapter{Ensemble Learning}
+
+Ensemble methods (also known as classifier combination methods) are used to improve classification accuracy by aggregating the predictions of multiple classifiers. An ensemble method constructs a set of \textbf{base classifiers} trained on the training set (sampled differently depending on the specific technique), and then predicts the output on instances by taking the majority vote.
+
+The key idea that justifies the use of ensemble methods is the so-called \hyperlink{https://en.wikipedia.org/wiki/The_Wisdom_of_Crowds}{\textbf{wisdom of the crowds}}: the collective knowledge of a diverse and independent group of people usually exceeds that of a single individual. According to Surowiecki, there are five elements required to form a wise crowd: diversity of opinion, independence, decentralization, aggregation, and trust. These same elements can be applied to machine learning, where each ``individual'' in the crowd is a model.
+
+To illustrate how a classifier's performance can be improved, consider the following example. \\
+We have an ensemble of 25 binary classifiers, each with the same error rate $\varepsilon = 0.35$. The ensemble predicts the class label of a test instance by taking the majority vote on the predictions of the single classifiers. If these classifiers are perfectly identical, then they will all answer the same way on any test input, so the error rate of the ensemble will also be $\varepsilon$.
+
+If instead the base classifiers are independent (their errors are uncorrelated), the ensemble makes a wrong prediction only if more than half of the base classifiers make a mistake; so the error rate of the ensemble is:
+\begin{equation*}
+    e = \sum_{i=13}^25 \binom{25}{i} \varepsilon^i (1-\varepsilon)^{25 - i} = 0.06
+\end{equation*}
+which is considerably lower than $\varepsilon$. \\\\
+Ensemble classifiers can be constructed in many ways:
+\begin{itemize}
+    \item By manipulating the training set (bagging, boosting);
+    \item By manipulating the input features (random forests);
+    \item By manipulating the class labels. (error-correcting output coding).
+\end{itemize}
+
+\section{Bagging}
+
+Bagging, which stands for Bootstrap AGGregatING, is a technique that samples with replacement from a data set according to a probability distribution. Given a dataset $X = \{x_1, \dots, x_n \}$, $m$ datasets o size $n$ are sampled from it, such that each record $x_i$ has $\frac{1}{n}$ probability of being extracted. Since replacement is used, the same record may appear multiple times in the same sample, while some records may not appear at all.
+\begin{algorithm}
+\caption{Bagging algorithm.}
+\begin{algorithmic}[1]
+    \State Let $k$ be the number of bootstrap samples.
+
+    \For{$i=1$ to $k$}
+        \State $D_i$ = Sample of size $N$.
+        \State Train a base classifier $C_i$ on $D_i$.
+    \EndFor
+    \State $C^*(x) = \arg\max_y \sum_i \delta(C_i(x) = y)$
+\end{algorithmic}
+\end{algorithm} \\
+In the above pseudocode, $\delta()$ is a function that returns 1 if its argument is true, 0 else.
+
+Bagging improves generalization error by reducing the variance of the base classifiers. The performance of bagging depends on the stability of the base classifier: if a base classifier is unstable, bagging helps to reduce the errors associated with fluctuations in the training data, and if it is stable, the error of the ensemble will be mainly caused by bias of the base classifier.
+
+\section{Boosting}
+
+Boosting is an iterative procedure used to change the distribution of training examples for base classifiers, increasing weights for instances that are harder to learn. Initially, all instances in the original dataset are assigned a weight equal to $\frac{1}{n}$; a sample is selected (the same way bagging does, with replacement), and a classifier is built on it. All records that are incorrectly classified by this base classifier have their weight increased, while the ones that are correctly classified have theirs decreased. For the next step, another sample is obtained considering the new weights, and used to train a second model. After classifying those instances, their weights are updated, and this goes on until the desired number of boosting rounds is reached.
+
+\subsection{AdaBoost}
+
+In the AdaBoost algorithm, each base classifier $C_i$ is assigned an \textbf{importance}. It depends on the classifier's error rate, defined as:
+\begin{equation*}
+    \varepsilon_i = \dfrac{1}{l} \sum_{j=1}^l w_j \delta(C_i(x_j) \neq y_i)
+\end{equation*}
+where $\delta()$ is the same function seen in the bagging pseudocode. The importance is then calculated as:
+\begin{equation*}
+    \alpha_i = \dfrac{1}{2} \ln \left(\dfrac{1-\varepsilon_i}{\varepsilon_i}\right)
+\end{equation*}
+When the error is close to 0, the importance is a large positive value, while when the error is close to 1, the importance is a large negative value.
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.4\linewidth]{img/importance_vs_errorrate.png}
+    \caption{$\alpha$ as a function of the error rate.}
+    \label{fig:importance-errorrate}
+\end{figure} \\
+The importance is used to update the weights of the training examples, as well. Given an example $x_i$, its corresponding weight at boosting round $j+1$ is:
+\begin{equation*}
+    w_i^{(j+1)} = \dfrac{w_i^{(j)}}{Z_j} \times \begin{cases}
+        e^{-\alpha_j} & C_j(x_i) \neq y_i \\
+        e^{\alpha_j} & C_j(x_i) \neq y_i 
+    \end{cases}
+\end{equation*}
+$Z_j$ is the normalization factor, used to ensure that $\sum_i w_i^{(j+1)} = 1$. Using this formula, the weights of examples are increased for those incorrectly classified and decreased for those correctly classified, but the update is influenced by how ``good'' the classifier is. The classification is also influenced by the importance of the classifier:
+\begin{equation*}
+    C*(x) = \arg\max_y \sum_{j=1}^T \alpha_j \delta(C_j(x) = y)
+\end{equation*}
+This approach penalizes models with poor accuracy; additionally, if any intermediate boosting round produces an error rate higher than 50\%, the weights of the examples are reverted to their original value $\frac{1}{l}$, and the resampling procedure is repeated.
+
+A default choice of models used by AdaBoost is \textbf{decision stumps}, a decision tree with only the root and two leaf nodes. By themselves, they are very weak learners, but together in an ensemble, they can be very powerful.
+
+\section{Random Forest}
+
+Random forests improve the performances of classifiers by constructing an ensemble of decorrelated decision trees. A key feature of this method is that each base model receives a sample that only selects a subset of the original attributes, usually of dimension $m' \approx \sqrt{m}$, or $m' \approx \log(m)$.
+
+The decision trees used in a random forest are unpruned, as they are allowed to grow to their largest possible size until every leaf is pure. Hence, the base classifiers have lo bias but high variance.
+
+This technique is one of the most accurate learning algorithms available, and is also efficient even on large datasets with thousands of input variables with no need for explicit variable deletion. It also provides an estimate of which variables are most important in classification, and generates an internal unbiased estimate of the generalization error as the forest building progresses.
