@@ -82,7 +82,7 @@ This approaches is similar to statistical-based ones, although it does not depen
 Depth-based approaches search for outliers at the border of the data space. Instances are first organized in convex hull layers, and outliers are points that lie in the outermost layers, while normal points are those which lie in the center of the data space, therefore in the innermost layers.
 
 The figure below shows an example dataset.
-\begin{figure}[h]
+\begin{figure}[ht]
     \centering
     \includegraphics[width=0.5\linewidth]{img/depth_based_od.png}
     \caption{Example of depth-based outlier detection.}
@@ -118,7 +118,7 @@ To fix this problem, the \textbf{average relative density} can be used instead. 
     \textit{avg. relative density}(x,k) = \dfrac{\textit{density}(x,k)}{\sum_{y \in N(x,k) \textit{density}(y,k)/|N(x,k)|}}
 \end{equation*}
 where $N(x,k)$ is the $k$-nearest neighbor of $x$. This way, the density around a point depends on that of its nearest neighbors. If the dataset has areas with differing densities, points in lower density areas will not be classified as outliers. If a point is so faraway that its normal density is high, this relative density will also be high. However, if a point is an outlier only for a very dense cluster, it may not be identified (such as the situation in the figure below).
-\begin{figure}[h]
+\begin{figure}[ht]
     \centering
     \includegraphics[width=0.5\linewidth]{img/relative_density.png}
     \caption{An example in which average relative density fails. Notice how point $D$ is an outlier for the denser cluster, but it is treated as a normal point.}
@@ -156,7 +156,7 @@ The COF is then calculated as:
 \subsubsection{INFLuenced Outlierness (INFLO)}
 
 Another issue that the previous methods fail to address is if clusters of different densities are not well separated.
-\begin{figure}[h]
+\begin{figure}[ht]
     \centering
     \includegraphics[width=0.5\linewidth]{img/inflo.png}
     \caption{In this example, points $q$ and $r$ have a lower LOF compared to $p$, despite it not being an outlier for the sparse cluster on the right.}
@@ -201,7 +201,7 @@ The CBLOF is calculated depending on the size of the cluster the point belongs t
 \section{High-dimensional Approaches}
 
 All the approaches seen until now have one big problem in common: they are affected by the curse of dimensionality, and so they don't work well in high-dimensional spaces. An alternative to considering distances is instead considering angles, with \textbf{angle-based outlier detection}. The idea is to compare the angles between pairs of distance vectors that start from the same point. If a point is inside a cluster of data, most angles forming between distance vectors connecting that point and all other points will differ widely. For outliers, instead, all those angles will be similar to each other.
-\begin{figure}[h]
+\begin{figure}[ht]
     \centering
     \includegraphics[width=0.7\linewidth]{img/angle_based_od.png}
     \caption{Intuition behind angle-based outlier detection.}
@@ -251,7 +251,7 @@ where $h(x)$ represents the path length from the root to $x$, and $c(n)$ is the 
     \end{cases}
 \end{equation*}
 $H(i) = \ln(i) + \gamma, \gamma \approx 0.57$ is the $i^{th}$ \hyperlink{https://en.wikipedia.org/wiki/Harmonic_number}{harmonic number}.
-\begin{figure}[h]
+\begin{figure}[ht]
     \centering
     \includegraphics[width=0.35\linewidth]{img/isolation_tree.png}
     \caption{An example of tree: in red the path from the root to an anomaly, in blue the path to a normal point.}
@@ -259,7 +259,7 @@ $H(i) = \ln(i) + \gamma, \gamma \approx 0.57$ is the $i^{th}$ \hyperlink{https:/
 \end{figure}
 Isolation forests are computationally efficient, paralellizable, and can handle high dimensional data. However, inconsistent scoring can be observed since the space is always split across one dimension at a time. The \textbf{extended isolation forest} model solves this problem: instead of choosing a dimension, each tree randomly selects both a normal vector and an intercept describing an angled hyperplane.
 \clearpage
-\begin{figure}[H]
+\begin{figure}[ht]
     \centering
     \includegraphics[width=0.5\linewidth]{img/isolation_forests.png}
     \caption{Isolation forests and Extended isolation forests, compared.}

@@ -38,7 +38,7 @@ One way to calculate shape-based dissimilarity is using Euclidean distance. Give
 The most common distortions are:
 \begin{itemize}
     \item \textbf{Offset translation}: the series have different offsets on the y axis. Calculating the distance without addressing this problem would return a value that is drastically larger than the actual shape distance. This can be corrected by subtracting each series with its own mean value.
-    \begin{figure}[h]
+    \begin{figure}[ht]
         \centering
         \begin{minipage}{0.40\textwidth}
          \includegraphics[width=1.0\linewidth]{img/offset_trans_1.png}
@@ -52,7 +52,7 @@ The most common distortions are:
     \end{figure}
 
     \item \textbf{Amplitude scaling}: the series have the same shape, but are scaled differently on the y axis. This is corrected by applying Z-score normalization to the values of the series (subtracting the mean and dividing by the standard deviation).
-    \begin{figure}[h]
+    \begin{figure}[ht]
         \centering
         \begin{minipage}{0.40\textwidth}
             \includegraphics[width=1.0\linewidth]{img/ampli_scaling_1.png}
@@ -66,7 +66,7 @@ The most common distortions are:
     \end{figure}
 
     \item \textbf{Linear trend}: series can follow upwards or downwards linear trends, which means that as they progress they increase or decrease in level. This can be corrected by finding the best fitting line to a time series, and subtracting it from the time series itself.
-    \begin{figure}[h]
+    \begin{figure}[ht]
         \centering
         \begin{minipage}{0.40\textwidth}
             \includegraphics[width=1\linewidth]{img/lin_trend_1.png}
@@ -80,7 +80,7 @@ The most common distortions are:
     \end{figure}
 
     \item \textbf{Noise}: noise is the presence of random error in the series. To remove noise, each data point can be replaced with the average value of its neighbors.
-    \begin{figure}[h]
+    \begin{figure}[ht]
         \centering
         \includegraphics[width=0.9\linewidth]{img/noise_trans.png}
         \caption{Noise transformation.}
@@ -102,7 +102,7 @@ In practice, DTW is calculated in three steps. First, given the series $Q$ and $
 \end{equation*}
 
 The dynamic programming approach to the problem starts by calculating the distance matrix for the two series; then, the matrix of cumulative costs for each path; finally, the path with the best alignment is found, connecting the cells with the lowest cost.
-\begin{figure}[h]
+\begin{figure}[ht]
     \centering
     \includegraphics[width=1.0\linewidth]{img/dtw.png}
     \caption{How Dynamic Time Warping is calculated.}
@@ -121,7 +121,7 @@ When the performances of Euclidean distance and DTW are compared for classificat
 
 A global constraint limits the indices of the warping path $w_k = (i,j)_k$, such that $j-r \leq i \leq j+r$, where $r$ is an integer that defines the allowed range of warping for a given point in the series. This restricts the computation of distances and cumulative costs to a small window described by $r$. Two types of global constraints are the \textbf{Sakoe-Chiba Band} (restriction around the diagonal) and the \textbf{Itakura Parallelogram} (greater restriction at extremes of series, less restriction in the middle). Empirical analysis shows that given a dataset, the increase in the value of $r$ will rapidly improve performances, but after reaching a maximum they will decrease and then plateau.
 
-\begin{figure}[h]
+\begin{figure}[ht]
     \centering
     \includegraphics[width=0.7\linewidth]{img/dtw_global_constr.png}
     \caption{Global constraints.}
@@ -166,7 +166,7 @@ Approximation is a form of Dimensionality Reduction designed for time series. Co
     Each region is assigned a different symbol from the chosen alphabet. The PAA coefficients can be mapped to the region to which they reside in a bottom-up fashion: the coefficients that fall in the lowest region are converted to $a$, the ones in the second lowest region to $b$, and so on. At the end, the representation will correspond to a sequence of symbols.
 \end{itemize}
 \clearpage
-\begin{figure}[h]
+\begin{figure}[ht]
     \centering
     \includegraphics[width=1.0\linewidth]{img/approximations.png}
     \caption{The most common time series approximations.}

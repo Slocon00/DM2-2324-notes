@@ -29,7 +29,7 @@ At the end of these random perturbations, motifs can be observed in the collisio
 
 Given a time series $T$, and having calculated the pairwise distance among all the $|T| - (n - 1)$ subsequences that can be extracted from $T$ using a sliding window of length $n$, the \textbf{Matrix Profile} (\textbf{MP}) of a $T$ is the vector that annotates the distance between each subsequence and its nearest neighbor. The index of the corresponding nearest neighbor of each subsequence is stored in a vector called \textbf{Matrix Profile Index}, which can be used to find the nearest neighbor in constant time. Pointers are not necessarily symmetric: if $n$ is the nearest neighbor of $m$, the nearest neighbor of $n$ is not necessarily $m$, but may be some other subsequence. However, for the two smallest values in the MP, the pointers of the corresponding subsequences must be mutual.
 
-\begin{figure}[h]
+\begin{figure}[ht]
     \centering
     \includegraphics[width=0.9\linewidth]{img/mp_mpi.png}
     \caption{Matrix Profile (on top) and Matrix Profile Index (on the bottom).}
@@ -42,7 +42,7 @@ To compute the matrix profile of a time series, the cells of the vector are init
 
 It may be useful to think of time series subsequences as points in an $m$ dimensional space: subsequences that are very similar will be close together in denser areas, which will in turn correspond to regions in the MP with low values. To understand how the top-k motifs are extracted, we can consider this data-point interpretation. A parameter $R > 1$ is chosen, and the two nearest points are found, called the \textbf{motif pair}. Given the distance $D_1$ between these two points, a circle with radius $D_1 * R$ is drawn around each point: any point that falls within either circles are added to this motif: this is the top-1 motif. To find the top-2 motif, the next closest pair of points is found (excluding the ones in the previous motif), whose distance is $D_2 > D_1$. Again, a circle of radius $D_2 * R$ is drawn around each circle, and all points in this circle are added to the motif. To choose when to stop, i.e., to choose the value of $k$, we can either use a predefined value, or use the Minimum Description Length.
 
-\begin{figure}[h]
+\begin{figure}[ht]
     \centering
     \includegraphics[width=0.5\linewidth]{img/topk_motifs.png}
     \caption{A graphical interpretation of how top k-motifs are found. The red dots are the top 1-motif, and the magenta ones are the top-2 motifs.}
@@ -63,7 +63,7 @@ Since shapelets are much shorter than the time series they're extracted from, we
 \end{equation*}
 where $S_T^{|S|}$ is the set of all possible subsequences of $T$. This function returns the distance between $S$ and the ``best matching'' location in $T$. Each time series in a dataset can be represented as a vector of distances with the shapelets extracted from them: if a given time series belongs to a certain class, it will be very close to the representative shapelet(s) of that specific class, and further away from shapelets that represent other classes.
 
-\begin{figure}[h]
+\begin{figure}[ht]
     \centering
     \includegraphics[width=0.5\linewidth]{img/subsequencedist.png}
     \caption{The best matching location of $S$ over $T$.}
