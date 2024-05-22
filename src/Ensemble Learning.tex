@@ -81,3 +81,81 @@ Random forests improve the performances of classifiers by constructing an ensemb
 The decision trees used in a random forest are unpruned, as they are allowed to grow to their largest possible size until every leaf is pure. Hence, the base classifiers have lo bias but high variance.
 
 This technique is one of the most accurate learning algorithms available, and is also efficient even on large datasets with thousands of input variables with no need for explicit variable deletion. It also provides an estimate of which variables are most important in classification, and generates an internal unbiased estimate of the generalization error as the forest building progresses.
+
+\section{Gradient Boosting}
+
+The goal of gradient boosting is to find the best hypothesis by expanding a starting function. In the case of regression, the functions are:
+\begin{align*}
+    &F_0(x) = \arg \min_{\gamma} \sum_{i=1}^n L(y_i, \gamma) = \mathrm{E}[y] \\
+    &F_m(x) = F_{m-1}(x) + \left ( \arg \min_{h_m \in H} \sum_{i=1}^n L(y_i, F_{m-1}(x_i) + h_m(x_i)) \right ) (x)
+\end{align*}
+where $h_m$ is a base learner function, and the loss function is usually Squared Error Loss.
+
+Choosing the best function at every step is a difficult optimization problem, so a steepest descent approach is used. After calculating $F_0(x)$ (which is simply the mean of all the target variable values), the following steps are repeated:
+\begin{enumerate}
+    \item The \textbf{pseudo-residuals} are calculated as:
+    \begin{equation*}
+        r_{im} = \left [ \dfrac{\partial L(y_i, F(x_i))}{\partial F_{m-1}(x_i)} \right ] \ \forall i = 1, \dots, n
+    \end{equation*}
+    (that is, the gradient).
+
+    \item A base learner (usually a weak learner, e.g., a tree) is fit to the data, using the training set $\{x_i, r_{im}\}_{i=1}^n$. This creates a set of \textbf{terminal regions} $R_{jm}$ (in the case of trees, these regions correspond to the different leaves).
+
+    \item The multiplier values $\gamma_{jm}$ are calculated as:
+    \begin{equation*}
+        \gamma_{jm} = \arg \min_{\gamma} \sum_{i:x_i \in R_{jm}} L(y_i, F_{m-1}(x_i) + \gamma)
+    \end{equation*}
+    These are the values that minimize the loss function within each leaf.
+
+    \item The $m^{th}$ function is updated:
+    \begin{equation*}
+        F_m(x) = F_{m-1}(x) + \nu \sum_{j=1}^{J_m} \gamma_{jm} 1(x \in R_{jm}) 
+    \end{equation*}
+    where $\nu$ is a learning rate, and $1(\cdot)$ is an indicator function.
+\end{enumerate}
+
+When using gradient boosting for classification, the predictions are calculated as the log odds for the positive class. To transform it into a probability, the logistic function is used:
+\begin{equation*}
+    \dfrac{e^{log(p)}}{1+e^{log(p)}}
+\end{equation*}
+Pseudo-residuals are then calculated as the difference between the observed value and the predicted value. Since leaves will contain a mix of different values, the $\gamma_{jm}$ values are calculated as:
+\begin{equation*}
+    \gamma_{jm} = \dfrac{\sum_i \textit{Residual}_i}{\sum_i \left [ p_i(1-p_i) \right ]}
+ \end{equation*}
+
+\subsection{XGBoost}
+
+XGBoost (eXtreme Gradient Boosting) is an implementation of regularized Gradient Boosting. The first step in the training phase is to choose a starting value; it can be anything, but by default it is 0.5 (regardless of wheter the problem is of regression or classification). Unlike Gradient Boosting which uses regular regression trees, XGBoost uses a special kind of model that is built as follows:
+\begin{enumerate}
+    \item The tree is initialized with a single leaf, containing all the residuals for all data points.
+    
+    \item For, regression, the \textbf{similarity score} is calculated as:
+        \begin{equation*}
+            \textit{Similarity Score} = \dfrac{(\sum_i \textit{Residual}_i)^2}{l + \lambda}
+        \end{equation*}
+    where $l$ is the number of residuals in the leaf, and $\lambda$ is a regularization term.
+    For classification, the similarity score is calculated as:
+    \begin{equation*}
+        \textit{Similarity Score} = \dfrac{(\sum_i \textit{Residual}_i)^2}{\sum_i(p_i (1-p_i)) + \lambda}
+    \end{equation*}
+
+    \item Different splits are evaluated, and their similarity score is calculated: the one which improves the gain in similairity is chosen. This continues for each leaf until the desired tree depth is reached (by default, it is 6). Typically, the higher $\lambda$ is, the lower the similarity scores will be.
+    
+    \item Finally, the tree is pruned to avoid overfitting. A parameter $\gamma$ is set as a threshold, such that if a leaf's similarity is less than gamma, it is cut.
+\end{enumerate}
+
+\subsection{LightGBM}
+
+LightGBM is another implementation of Gradient Boosting, which has faster training speeds than XGBoost, as well as higher accuracy. It uses a technique called \textbf{Histogram-based Gradient Boosting}, which discretizes continuous features into discrete bins (this approach also makes it so that LightGBM requires less memory). It also supports parallel and GPU learning.
+
+When looking at the trees produced by this framework, they tend to show a lot of vertical growth, as opposed to those produced by XGBoost, which instead tend to grow horizontally.
+
+LightGBM uses \textbf{Gradient-Based One-Side Sampling} (\textbf{GOSS}), which retains instances with larger gradients and samples those with lower gradients (basically focusing less on instances which have low training error). Another technique used is \textbf{Exclusive Feature Bundling} (\textbf{EFB}), a near lossless method to reduce the number of features, bundling features that are mutually exclusive (i.e., they never take zero values simultaneously) together.
+
+\subsection{CatBoost}
+
+CatBoost (Categorical Boosting) is a library that provides a gradient boosting framework. It uses \textbf{target encoding}, replacing each category of a variable with a number calculated from the distribution of the target labels for that category (e.g., the mean value). It uses \textbf{Symmetric Decision Trees}, which are balanced trees with the same splitting condition for all nodes at the same level.
+
+\subsection{Explainable Boosting Machines}
+
+Explainable Boosting Machines (EBM) are a type of Generalized Additive Model (GAM). The model trains one feature at a time, in a round-robin fashion at each iteration. They produce exact explanations about the model's predictions. 
