@@ -79,7 +79,16 @@ If instead we minimize it with respect to $b$:
 \begin{gather*}
     \dfrac{\partial J}{\partial b} = 0 - \sum_{i=1}^N \alpha_i d_i = 0 \, .
 \end{gather*}
-These can be substituted in $J$ to study the dual form of the problem. \\
+These can be substituted in $J$ to study the dual form of the problem.
+To calculate $b_o$, we know that given a positive support vector $x^{(s)}$, it holds that:
+\begin{equation*}
+    w_o^T x^{(s)} + b_o = 1 \, ,
+\end{equation*}
+therefore
+\begin{equation*}
+    b_o = 1 - \sum_{i=1}^N \alpha_{o,i} d_i x_i^T x^{(s)} \, .
+\end{equation*}
+\\
 From the \textbf{Kuhn-Tucker Conditions}, it follows that
 \begin{equation*}
     \alpha_i (d_i (w^T x_i + b) - 1) = 0 \, , \forall i = 1, \dots , N
@@ -101,12 +110,7 @@ satisfying the constraints
     \sum_{i=1}^N \alpha_i d_i = 0 \, .
 \end{gather*}
 }
-The value of $\alpha_i$ can be found by solving the quadratic programming (QP) problem, or by more recent and efficient approaches (such as sequential minimal optimization (SMO)). Solving this problem scales with the number of training examples, less with the dimensionality. To find $w_o$ and $b_o$, we proceed as follows:
-\begin{gather*}
-    w_o = \sum_{i=1}^N \alpha_{o,i} d_i x_i \\
-    b_o = 1 - w_o^T x^{(s)} = 1 - \sum_{i=1}^N \alpha_{o,i} d_i x_i^T x^{(s)} \, .
-\end{gather*}
-How do we use all of this? We don't actually need to explicitly know $w_o$. All we need are calculating the Lagrangian multipliers by solving the dual problem, and then calculating $b_o$. So, given the input pattern $x$, we compute $g(x) = \sum_{i=1}^N \alpha_{o,i} d_i x_i^T x + b_o$, and classify it as $h(x) = sign(g(x))$.
+The value of $\alpha_i$ can be found by solving the quadratic programming (QP) problem, or by more recent and efficient approaches (such as sequential minimal optimization (SMO)). Solving this problem scales with the number of training examples, less with the dimensionality. We don't actually need to explicitly know $w_o$. All we need are calculating the Lagrangian multipliers by solving the dual problem, and then calculating $b_o$. So, given the input pattern $x$, we compute $g(x) = \sum_{i=1}^N \alpha_{o,i} d_i x_i^T x + b_o$, and classify it as $h(x) = sign(g(x))$.
 
 This approach of finding optimal separating hyperplane maximizing the margin also provides:
 \begin{itemize}

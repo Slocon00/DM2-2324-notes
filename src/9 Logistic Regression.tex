@@ -22,10 +22,10 @@ where $\beta_0$ and $\beta_1$ are regression coefficients. Since the value retur
 \end{gather*}
 So, for a set of given values for the model's parameters, its \textbf{likelihood} is calculated as:
 \begin{equation*}
-    \mathcal{L}_n(\beta_0, \beta_1; x) = \prod_{i: y_i = 1} f(x_i) * \prod_{j: y_i = 0}^{l-k} 1 - f(x_j)
+    \mathcal{L}_n(\beta_0, \beta_1; x) = \prod_{i: y_i = 1} f(x_i) * \prod_{j: y_j = 0} 1 - f(x_j)
 \end{equation*}
 i.e., it's the product of the likelihoods of each data point. In practice, the \textbf{log-likelihood} is used instead:
 \begin{equation*}
-    l(\beta_0, \beta_1; x) = \sum_{i: y_i = 1} \ln(f(x_i)) + \sum_{j: y_j = 0} \ln(1 - f(x_i))
+    l(\beta_0, \beta_1; x) = \sum_{i: y_i = 1} \ln(f(x_i)) + \sum_{j: y_j = 0} \ln(1 - f(x_j))
 \end{equation*}
 The likelihood is calculated for different parameters, gradually increasing it until it finds the optimal fit.

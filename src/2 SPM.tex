@@ -14,7 +14,7 @@ This sequence contains three elements, three unique events, and a total of 6 eve
 The \textbf{length} of a sequence ($|s|$) is the number of its elements. The \textbf{size} of the sequence is the total number of its events. A sequence of size $k$ is also known as a \textbf{$k$-sequence}.
 
 \BoxDef{Subsequence}{
-    A sequence $s = \langle s_1 s_2 \ldots s_n\rangle$ is a subsequence of a sequence $t = \langle t_1 t_2 \dots t_m\rangle$ if there exist integers $1 \leq i_1 < i_2 < \dots < i_k \leq n $ such that $s_1 \subseteq t_{i_1}, s_2 \subseteq t_{i_2}, \dots , s_n \subseteq t_{i_k}$.
+    A sequence $s = \langle s_1 s_2 \ldots s_n\rangle$ is a subsequence of a sequence $t = \langle t_1 t_2 \dots t_m\rangle$ if there exist integers $1 \leq i_1 < i_2 < \dots < i_n \leq m $ such that $s_1 \subseteq t_{i_1}, s_2 \subseteq t_{i_2}, \dots , s_n \subseteq t_{i_k}$.
 }
 If $s$ is a subsequence of $t$, then $s$ is \textbf{contained} in $t$.
 
@@ -56,7 +56,7 @@ A measure $f$ possesses the anti-monotone property if for every itemset $X$ that
 Time constraints control how support is calculated by considering the time elapsed between elements of a sequence. For example, consider a dataset that represents market basket data: each product is an event, each individual purchase is an element, and each data-sequence is a set of purchases made by a customer within some interval of time (months or years). If we're interested in finding a correlation between certain products, we may want to limit the time passed between transactions: if a customer bought product $A$, and then bought product $B$ several months after, then the sequence $\langle \{A\} \{B\} \rangle$ is not significant for the purposes of our analysis. The time constraints are three: \textbf{maxspan}, \textbf{maxgap}, and \textbf{mingap}.
 
 \BoxDef{maxspan}{
-The \textit{maxspan} constraint specifies the maximum time passed between the first and last element of a sequence. If $t_{i,i+1}$ is the time passed between consecutive elements $i$ and $i+1$ of a data-sequence, then the following inequality must hold true:
+The \textit{maxspan} constraint specifies the maximum time passed between the first and last element of a sequence. If $t_{i,i+1}$ is the time passed between consecutive elements $i$ and $i+1$ of a sequence, then the following inequality must hold true:
 
 \begin{equation*}
 	\sum t_{i,i+1} \leq \textit{maxspan}
@@ -64,7 +64,7 @@ The \textit{maxspan} constraint specifies the maximum time passed between the fi
 }
 
 \BoxDef{maxgap and mingap}{
-The \textit{maxgap} and \textit{mingap} constraints specify the maximum time and minimum time passed between two consecutive elements of a sequence, respectively. If $t_{i,i+1}$ is the time passed between consecutive elements $i$ and $i+1$ of a data-sequence of length $n$, then the following inequality must hold true for $i = 1 \ldots (n-1)$:
+The \textit{maxgap} and \textit{mingap} constraints specify the maximum time and minimum time passed between two consecutive elements of a sequence, respectively. If $t_{i,i+1}$ is the time passed between consecutive elements $i$ and $i+1$ of a sequence of length $n$, then the following inequality must hold true for $i = 1 \ldots (n-1)$:
 
 \begin{equation*}
     \textit{mingap} < t_{i,i+1} \leq \textit{maxgap}

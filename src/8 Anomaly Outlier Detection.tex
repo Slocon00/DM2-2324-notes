@@ -63,7 +63,7 @@ An example of such approach is the one proposed in \cite{arning1996linear}, wher
 \begin{itemize}
     \item A set of items $I$;
     \item A dissimilarity function $D$;
-    \item A cardinality function $C$, such that $I_1 \subset T_2 \implies C(I_1) < C(I_2)$ for all $I_1, I_2 \subseteq I$;
+    \item A cardinality function $C$, such that $I_1 \subset I_2 \implies C(I_1) < C(I_2)$ for all $I_1, I_2 \subseteq I$;
 \end{itemize}
 Define for each $I_j \subset I$ the \textbf{smoothing factor}:
 \begin{equation*}
@@ -100,7 +100,7 @@ A simple way to define the anomaly score of an instance $x$ is to use its distan
 
 Another common algorithm uses two parameters, a radius $\varepsilon$ and a percentage $\pi$, such that a point $p$ is considered an outlier if at most $\pi$ percent of all other points have a distance to $p$ less than $\varepsilon$ ($p$ is close to very few points). Formally, the set of outliers is computed as:
 \begin{equation*}
-    \textit{OutlierSet}(\varepsilon, \pi) = \left\{ p | \dfrac{\#\{q \in D | \textit{dist}(p,q) < \epsilon}{\# D} \leq \pi \right\}
+    \textit{OutlierSet}(\varepsilon, \pi) = \left \{ p | \dfrac{\#\{q \in D | \textit{dist}(p,q) < \epsilon \}}{\# D} \leq \pi \right \}
 \end{equation*}
 
 Finally, outliers can be identified using the \textbf{in-degree number}. Given a dataset, the $k$-NN graph is constructed: each vertex is a data point, and each directed edge between two vertices $p$ and $q$ means that $q$ is one of $p$'s k-nearest neighbors. The in-degree of a point is calculated as the number of reverse $k$-NNs (R$k$-NN), i.e., the number of points who have it as a neighbor. If a point has an in-degree lower than some user-defined threshold, it is declared an outlier. This algorithm outputs an outlier label.
@@ -111,13 +111,13 @@ Finally, outliers can be identified using the \textbf{in-degree number}. Given a
 
 \subsection{Density-based}
 
-The density around an instance can be defined as $n/V(d)$, where $n$ is the number of instances within a given distance, and $V(d)$ is the volume of the neighborhood. Since $V(d)$ is constant for a given $d$, the density is often only represented using $n$ after fixing a value of $d$. Outliers can be defined as points that are in regions of low density, and their anomaly score as the inverse of the density around them (or the inverse of distance to the $k^{th}$ distance, or the inverse of the average distance to $k$ neighbors). However, if the dataset has regions of different density, this approach can present problems (as seen when discussing DBSCAN).
+The density around an instance can be defined as $n/V(d)$, where $n$ is the number of instances within a given distance, and $V(d)$ is the volume of the neighborhood. Since $V(d)$ is constant for a given $d$, the density is often only represented using $n$ after fixing a value of $d$. Outliers can be defined as points that are in regions of low density, and their anomaly score as the inverse of the density around them (or the inverse of distance to the $k^{th}$ neighbor, or the inverse of the average distance to $k$ neighbors). However, if the dataset has regions of different density, this approach can present problems (as seen when discussing DBSCAN).
 
 To fix this problem, the \textbf{average relative density} can be used instead. Given a point $x$ and a number of neighbors $k$, it is calculated as:
 \begin{equation*}
     \textit{avg. relative density}(x,k) = \dfrac{\textit{density}(x,k)}{\sum_{y \in N(x,k) \textit{density}(y,k)/|N(x,k)|}}
 \end{equation*}
-where $N(x,k)$ is the $k$-nearest neighbor of $x$. This way, the density around a point depends on that of its nearest neighbors. If the dataset has areas with differing densities, points in lower density areas will not be classified as outliers. If a point is so faraway that its normal density is high, this relative density will also be high. However, if a point is an outlier only for a very dense cluster, it may not be identified (such as the situation in the figure below).
+where $N(x,k)$ is the $k$-neighborhood of $x$. This way, the density around a point depends on that of its nearest neighbors. If the dataset has areas with differing densities, points in lower density areas will not be classified as outliers. If a point is so faraway that its normal density is low, this relative density will also be low. However, if a point is an outlier only for a very dense cluster, it may not be identified (such as the situation in the figure below).
 \begin{figure}[ht]
     \centering
     \includegraphics[width=0.5\linewidth]{img/relative_density.png}
@@ -127,7 +127,7 @@ where $N(x,k)$ is the $k$-nearest neighbor of $x$. This way, the density around 
 
 \subsubsection{Local Outlier Factor (LOF)}
 
-An alternative is using the \textbf{Local Outlier Factor} (\textbf{LOF}). First, for each pair of points $p$ and $o$ in the dataset, their \textbf{reachability distance}is calculated, identical to that used in OPTICS:
+An alternative is using the \textbf{Local Outlier Factor} (\textbf{LOF}). First, for each pair of points $p$ and $o$ in the dataset, their \textbf{reachability distance} is calculated, identical to that used in OPTICS:
 \begin{equation*}
     \textit{reachability-dist}_k(p,o) = \max \{\textit{k-dist}(o), \textit{dist}(p,o)\}
 \end{equation*}
@@ -145,9 +145,9 @@ If a point's LOF is close to 1, then the point is inside a cluster, and if it is
 
 Sometimes, in regions of low density, LOF may fail to detect outliers, unless we use a small $k$. However, using a too small $k$ may include outliers as normal points. A solution is using the \textbf{Connectivity-based Outlier Factor}. It uses \textbf{chaining distance} to calculate a point's nearest neighbor. The average chaining distance is calculated as:
 \begin{equation*}
-    \textit{ac-dist}_{N_{k(p)}}(p) = \sum_{i=1}^{r-1} \dfrac{2(r-i)}{r(r-1)} CDS_i
+    \textit{ac-dist}_{N_{k(p)}}(p) = \sum_{i=1}^{k-1} \dfrac{2(r-i)}{r(r-1)} CDS_i
 \end{equation*}
-where $r$ is the number of neighbors in $p$'s $k$-neighborhood, and $CDS_i$ is the cost description sequence of removing the $i^{th}$ neighbor. The chaining distance for a point can be seen as the minimum of the total sum of the distances linking all neighbors. In practice, it is calculated with a graph-like structure. \\
+where $k$ is the number of neighbors in $p$'s $k$-neighborhood, and $CDS_i$ is the cost description sequence of removing the $i^{th}$ neighbor. The chaining distance for a point can be seen as the minimum of the total sum of the distances linking all neighbors. In practice, it is calculated with a graph-like structure. \\
 The COF is then calculated as:
 \begin{equation*}
     \textit{COF}_k(p) = \dfrac{|N_k(p)| \textit{ac-dist}_{N_{k(p)}}}{\sum_{o \in N_{k(p)}} \textit{ac-dist}_{N_{k(o)}}(o)}
@@ -162,9 +162,11 @@ Another issue that the previous methods fail to address is if clusters of differ
     \caption{In this example, points $q$ and $r$ have a lower LOF compared to $p$, despite it not being an outlier for the sparse cluster on the right.}
     \label{fig:inflo}
 \end{figure}
-The idea behind INFLO is to take symmetric neighborhood relationships into account. In other words, it considers both nearest neighbors as well as the reverse nearest neighbors (that is, the points having $p$ as a neighbor), defining the \textbf{influence space} of a point $p$ (indicated with $kIS(p)$).
-
-Density is simply calculated as the inverse of the $k$-distance of a point. The INFLO is then calculated as:\begin{equation*}
+The idea behind INFLO is to take symmetric neighborhood relationships into account. In other words, it considers both nearest neighbors as well as the reverse nearest neighbors (that is, the points having $p$ as a neighbor), defining the \textbf{influence space} of a point $p$ (indicated with $kIS(p)$):
+\begin{equation*}
+    kIS(p) = \textit{k-NN}(p) \cup \textit{Rk-NN}(p)
+\end{equation*}    
+The density of each ponint is simply calculated as the inverse of its $k$-distance. The INFLO is then calculated as:\begin{equation*}
     \textit{INFLO}_k(p) = \dfrac{\sum_{o \in kIS(p)} \dfrac{\textit{dens}(o)}{\# kIS(p)}}{dens(p)}
 \end{equation*}
 Similarly to LOF, if it is close to 1 the point is in a cluster, if instead it is much greater than 1, the point is an outlier.
@@ -182,7 +184,7 @@ Some clustering algorithms are already capable of separating points belonging to
 Just as we have seen for density-based outliers, we can use \textbf{Cluster-Based Local Outlier Factor} (\textbf{CBLOF}). To calculate it, first a clustering algorithm is used to find clusters in the dataset. Then, each cluster is classified as either a \textbf{small cluster} (\textbf{SC}), or \textbf{large cluster} (\textbf{LC}), using two parameters, $\alpha$ and $\beta$. Specifically, given the clustering $C = \{C_1, C_2, \dots, C_k \}$ such that $|C_1| \geq |C_2| \geq \dots \geq |C_k|$, a boundary $b$ is found if one of the following inequalities hold:
 \begin{gather*}
     |C_1| + |C_2| + \dots + |C_b| \geq |D|*\alpha \\
-    |C_b|/|C_{b+1} \geq \beta
+    |C_b|/|C_{b+1}| \geq \beta
 \end{gather*}
 This means that all clusters up until the $b^{th}$ contain $\alpha \%$ of the data points (first formula), or that the smallest of the large clusters must be at least $\beta$ times larger than the larger of the small clusters (second formula). 
 
@@ -227,7 +229,7 @@ This is a very coarse model: all the points within a cell with low sparsity are 
 
 Ensemble-based means that a group of methods is used on the same dataset, and the final result will be a combination of their singular outcomes. For outlier detection, \textbf{feature bagging} (\textbf{FeaBag}) is used: a set of different outlier detection methods is selected, and each of them is applied on a random set of features selected from the original feature space. Each method will identify different outliers, assigning them outlier scores. The average of those scores is then returned for each point.
 
-An extension of histogram-based outlier score is \textbf{lighteight on-line detector of anomalies} \textbf{(LODA)}. It is especially useful in real-time scenarios where a big amount of records must be processed. LODA approximates the joint probability using a collection of one-dimensional histograms, each constructed on an input space projected onto a randomly generated vector. Even thoug one-dimensional histograms are weak outlier detection methods by themselves, their collection yields good results.
+An extension of histogram-based outlier score is \textbf{lightweight on-line detector of anomalies} \textbf{(LODA)}. It is especially useful in real-time scenarios where a big amount of records must be processed. LODA approximates the joint probability using a collection of one-dimensional histograms, each constructed on an input space projected onto a randomly generated vector. Even thoug one-dimensional histograms are weak outlier detection methods by themselves, their collection yields good results.
 
 \section{Model-based Approaches}
 
@@ -242,9 +244,9 @@ Given a dataset of size $n$, the outlier score of a point $x$ is:
 \begin{equation*}
     s(x,n) = 2^{\dfrac{-\mathrm{E}[h(x)]}{c(n)}}
 \end{equation*}
-where $h(x)$ represents the path length from the root to $x$, and $c(n)$ is the average $h(x)$ given $m$, calculated as:
+where $h(x)$ represents the path length from the root to $x$, and $c(n)$ is the average $h(x)$ given $n$, calculated as:
 \begin{equation*}
-    c(m) = \begin{cases}
+    c(n) = \begin{cases}
         1 & n = 2 \\
         2 * H(n-1) - \dfrac{2(n-1)}{n} & n > 2 \\
         0 & \text{else}

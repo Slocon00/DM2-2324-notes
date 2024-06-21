@@ -34,7 +34,7 @@ Finally, undersampling can be done by first performing centroid-based clustering
 
 \subsection{Oversampling}
 
-\textbf{Oversampling} the minority class increases the amount of examples belonging to it. Oversampling can also be done with random sampling, with or without replacement, as seen for undersampling.
+\textbf{Oversampling} the minority class increases the amount of examples belonging to it. Oversampling can also be done with random sampling, (always with replacement, of course).
 
 \textbf{SMOTE} (Synthetic Minority Oversampling TEchnique) oversamples the minority class by adding data points via interpolation. It operates in the feature space, introducing synthetic examples along the segments that connect each sample with any/all of its minority class $k$ nearest neighbors. Depending on the amount of oversampling needed, the value of $k$ can be changed (by default, $k=4$). In practice, interpolation is done by taking the difference between the current sample and one of its neighbors; this difference is multiplied by a random number between 0 and 1, and the result is added to the values of the current sample. The final record represents a point that is somewhere along the segment that connects the sample and the neighbor.
 
@@ -46,7 +46,7 @@ An alternative to SMOTE is \textbf{ADASYN} (ADAptive SYNthetic). This algorithm 
 
     \item The $k$-NN of each minority sample is found, and the ratio of majority class examples is found for that neighborhood as $r_i = \#\textit{maj}_i / k$; this ratio is then normalized by dividing it by the sum of all the $r_i$.
 
-    \item The number of synthetic samples to generate for each neighborhood is calculated as $G_i = G_{r_i}$.
+    \item The number of synthetic samples to generate for each neighborhood is calculated as $G_i = G*r_i$.
 
     \item $G_i$ samples are generated for each neighborhood, taking two minority samples $(x_i, y_i)$ within the neighborhood, and interpolating among them (as SMOTE does).
 \end{enumerate}
