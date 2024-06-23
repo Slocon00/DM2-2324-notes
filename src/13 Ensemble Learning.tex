@@ -9,7 +9,7 @@ We have an ensemble of 25 binary classifiers, each with the same error rate $\va
 
 If instead the base classifiers are independent (their errors are uncorrelated), the ensemble makes a wrong prediction only if more than half of the base classifiers make a mistake; so the error rate of the ensemble is:
 \begin{equation*}
-    e = \sum_{i=13}^25 \binom{25}{i} \varepsilon^i (1-\varepsilon)^{25 - i} = 0.06
+    e = \sum_{i=13}^{25} \binom{25}{i} \varepsilon^i (1-\varepsilon)^{25 - i} = 0.06
 \end{equation*}
 which is considerably lower than $\varepsilon$. \\\\
 Ensemble classifiers can be constructed in many ways:

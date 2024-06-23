@@ -198,7 +198,7 @@ What we want to find is $w$ obtained by computing the gradient of the error func
     \item supposedly, the brain's learning ``algorithm'' is a local sub optimal approximation of backpropagation (although this debate remains controversial).
 \end{itemize}
 
-Other than SGD, other commonly used optimization algorithms are:
+Some commonly used optimization algorithms for Gradient Descent are:
 \begin{itemize}
     \item RMSprop, which adapts the learning rate by reducing it using a moving average of the squared gradient;
     \item Adagrad, similar to RMSProp but with element-wise scaling of the gradient;
@@ -207,9 +207,7 @@ Other than SGD, other commonly used optimization algorithms are:
 
 \subsection{Issues in Training NNs}
 
-The resulting model is often over-parameterized; additionally, the optimization problem is no longer convex, and is potentially unstable.
-
-Some problems in training NNs involve:
+The resulting model is often over-parameterized; additionally, the optimization problem is no longer convex, and is potentially unstable. Some problems in training NNs involve:
 \begin{itemize}
     \item \textbf{Hyperparameters}: starting values, choosing between on-line/batch, learning rate, number of hidden units in the network;
 
