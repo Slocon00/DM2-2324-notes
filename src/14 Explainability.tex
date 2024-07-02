@@ -1,14 +1,14 @@
 \chapter{Explainability}
 
-\textbf{Interpretability} (or \textbf{explainability}) is the degree to which a human can understand the cause of a decision. The higher the interpretability of a model, the easier it is for a person to understand why certain decisions or precisions have been made. Interpretability can be used not only to understand why a model gives a specific prediction, but also to highlight biases in the model or the data.
+\textbf{Interpretability} (or \textbf{explainability}) is the degree to which a human can understand the cause of a decision. The higher the interpretability of a model, the easier it is for a person to understand why certain decisions or predictions have been made. Interpretability can be used not only to understand why a model gives a specific prediction, but also to highlight biases in the model or the data.
 
 A \textbf{black box} is a model whose internals are either unknown to the observer, or they are known but uninterpretable by humans. Some examples of black box models are deep neural networks, support vector machines, and ensemble methods. Other models are instead interpretable by design, such as decision trees, linear regression, logistic regression, and rule-based models.
 
 Machine learning interpretability can be classified according to various criteria:
 \begin{itemize}
-    \item \textbf{Intrinsic or post-hoc}: intrinsic interpretability refers to models that are considered interpretable because of their simple structure, such as short decision trees or sparse linear models. Post-hoc interpretability refers to the application of interpretation methods after model training. Post.hoc methods can also be applied to intrinsecally interpretable models.
+    \item \textbf{Intrinsic or post-hoc}: intrinsic interpretability refers to models that are considered interpretable because of their simple structure, such as short decision trees or sparse linear models. Post-hoc interpretability refers to the application of interpretation methods after model training. Post-hoc methods can also be applied to intrinsecally interpretable models.
     
-    \item \textbf{Model-specific or model-agnostic}: model-specific interpretation methods are limited to specific model classes (e.g., the interpretation of regression weights in a linear model is model-specific). Model-agnostic methods can be applied on any machine learning model after the model has been trained. The latter work by analyzing the input and output pairs, since bydefinition they do not have access to the model internals.
+    \item \textbf{Model-specific or model-agnostic}: model-specific interpretation methods are limited to specific model classes (e.g., the interpretation of regression weights in a linear model is model-specific). Model-agnostic methods can be applied on any machine learning model after the model has been trained. The latter work by analyzing the input and output pairs, since by definition they do not have access to the model internals.
     
     \item \textbf{Local or global}: global methods explain the entire method's behaviour, while local ones explain the prediction of single instances.
 \end{itemize}
@@ -85,7 +85,7 @@ The steps taken to generate counterfactuals are:
     \item An instance $x$, a desired outcome $y'$, a tolerance $\epsilon$, and a regularization term $\lambda$ are chosen;
     \item A random instance is sampled as initial counterfactual;
     \item The loss is optiimzed, using that counterfactual as the starting point;
-    \item While $|\cap{f}(x') - y'| > \epsilon$, $\lambda$ is increased and the loss is optimized again. The counterfactual that minimizes the loss is returned.
+    \item While $|\hat{f}(x') - y'| > \epsilon$, $\lambda$ is increased and the loss is optimized again. The counterfactual that minimizes the loss is returned.
     \item Steps 2-4 are repeated and a list of counterfactuals is returned (or only the one that minimizes the loss).
 \end{itemize}
 
@@ -98,6 +98,8 @@ where \textit{dpp-diversity} is ``diversity via determinantal point processes'',
 Finally, counterfactuals can be found using \textbf{heuristic strategies}. These strategies are usually more efficient than optimization algorithms, but do not necessarily find solutions that are optimal. The search strategy is designed so that at each iteration, $x'$ is updated with the objective of minimizing a cost function.
 
 An example of a heuristic strategy is \textbf{GSG} (\textbf{Growing Spheres Generation}), which relies on a generative approach growing a sphere of syntetic instances around $x$ to find the closest counterfactual: it ignores the direction towards which the closest classification boundary might be, so the solution is not always optimal. The algorithm generates observations in spherical layers around the instance, until a potential counterfactual is found.
+
+An approach used for text data is \textbf{SEDC} (\textbf{Search for Explanations for Document Classification}), which excludes one word at a time from the document and evaluates the distance between the original and the new prediction; at each iteration, the permanently removed word is the one which minimizes this distance. Counterfactual generation stops when the removal with the minimal distance changes th prediction as well.
 
 Another example is \textbf{NNCE} (\textbf{Nearest-Neighbor Counterfactual Explainer}), which selects counterfactuals as the instances $x'$ most similar to $x$ and with a different label, using a nearest-neighbor search. Candidate counterfactuals are sorted with respect to the distance between $x$, and the $k$ most similar ones are selected.
 

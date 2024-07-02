@@ -32,17 +32,15 @@ Dimensionality reduction is the process of reducing the number of variables in t
 
     \item Autoencoders.
 \end{itemize}
-Random Subspace Projection is a very simple approach: given the number of attributes $n$ in the dataset $D \in \mathbb{R}^{n \times l}$, and the number of dimensions we want to reduce to $k$, a matrix $M \in \mathbb{R}^{k \times n}$ is randomly generated (such that its columns have unit length), and so the transformed data is $D' = MD$. It preserves the structure of the data, and is computationally cheap.
+Random Subspace Projection is a very simple approach: given the number of attributes $n$ in the dataset $D \in \mathbb{R}^{n \times l}$, and the number of dimensions we want to reduce to $k$, a matrix $M \in \mathbb{R}^{l \times k}$ is randomly generated (such that its rows have unit length), and so the transformed data is $D' = D \cdot M$. It preserves the structure of the data, and is computationally cheap.
 
 \subsection{Principal Component Analysis (PCA)}
 
 The goal of \textbf{Principal Component Analysis} is to find a new set of attributes that better capture the variability of the data; the first dimension is chosen as the one that captures as much of the variability as possible, the second one as the dimension that is orthogonal (uncorrelated) to the first and also captures the most of the remaining variability in the data, and so on until the number of desired dimensions is reached. These dimensions are obtained via linear transformations of the original attributes. The steps of PCA are the following:
 \begin{enumerate}
-    \item The dataset $X$ is standardized.
-    
-    \item The mean value of data is calculated across each dimension.
-    
-    \item The covariance matrix of all pairs of features is calculated; given a matrix of data $X$, the mean of each column is subtracted from the respective column vectors to get the centered matrix $C$, and so the covariance matrix of the row vectors of $X$ is calculated as $\Sigma = C^TC$.
+    \item The dataset $X$ is standardized, obtaining the zero-centered matrix $C$.
+        
+    \item The covariance matrix of all pairs of features is calculated as $\Sigma = C^TC$.
     
     \item The eigenvalues and eigenvectors of $\Sigma$ are found, and the $k$ eigenvectors corresponding to the largest eigenvalues are chosen.
     
@@ -56,7 +54,11 @@ In order to compute the eigenvalues and eigenvectors of the covariance matrix, \
 \begin{equation*}
     C = U S V^T \,,
 \end{equation*}
-where $S$ is the diagonal of $C$, and the columns of $V$ are the eigenvectors of the covariance matrix, sorted from largest to smallest eigenvalues.
+where $U$ is a unitary matrix, $S$ is the diagonal of $C$, and the columns of $V$ are the eigenvectors of the covariance matrix, sorted from largest to smallest eigenvalues. The matrix can be written as:
+\begin{equation*}
+    \Sigma = V L V^T \,,
+\end{equation*}
+where $L$ is a diagonal matrix containing the eigenvalues of $\Sigma$.
 
 \subsection{Multi-Dimensional Scaling (MDS)}
 
@@ -78,7 +80,7 @@ As a consequence, Sammon Mapping preserves the small $d_{ij}$, making them more 
 \begin{enumerate}
     \item For each data point, its $k$ nearest neighbors are found using Euclidean distance. These neighborhood relationships are represented as a weighted graph $G$, where each link between nodes $u$ and $v$ means that $u$ and $v$ are nearest neighbors, and has a weight that corresponds to the distance between $u$ and $v$.
 
-    \item The geodesic distance between all pairs of points on the data manifold is calculated by computing the shortest path distances on the graph $G$.
+    \item The \href{https://en.wikipedia.org/wiki/Geodesic}{geodesic} distance between all pairs of points on the data manifold is calculated by computing the shortest path distances on the graph $G$.
 
     \item An embedding of the data in a $k$-dimensional Euclidean space is constructed. This embedding is the one that best preserves the manifold geometry.
 \end{enumerate}

@@ -88,7 +88,7 @@ The most common distortions are:
     \end{figure} \\
     Noise can be removed by a \textbf{moving average} (\textbf{MA}): given a window of length $w$ and a time series $t$, the MA is applied as:
     \begin{equation*}
-        t_i = \dfrac{1}{w} \sum_{j=i-w/2}^{w/2} t_j \ i = 1, \dots , n
+        t_i = \dfrac{1}{w} \sum_{j=i-w/2}^{i + w/2} t_j \ i = 1, \dots , n
     \end{equation*}
 \end{itemize}
 
