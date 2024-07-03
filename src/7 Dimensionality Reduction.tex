@@ -64,7 +64,7 @@ where $L$ is a diagonal matrix containing the eigenvalues of $\Sigma$.
 
 Given a pairwise dissimilarity matrix, the goal of MDS is to learn a mapping of data into a lower dimensional space such that the relative distances are preserved. These methods are used to map data to very low configurations (e.g., 2 or 3 dimensions).
 
-The goal is to find a mapping such that $d_{ij} = \|x_i - x_j\|$ for all points in $D$. The function
+The goal is to find a mapping of the objects of a dataset, such that given $D$ the pairwise distance matrix of the dataset, $d_{ij} \approx \|x_i - x_j\|$ for all points in $D$. The function
     \begin{equation*}
         J(x) = \sum_{i=1}^n \sum_{j=1}^n d_1 (d_{ij}, d_2(x_i, x_j))
     \end{equation*}
@@ -91,6 +91,7 @@ For each input data point $x_i$, imagine we have a Gaussian distribution centere
 \begin{equation*}
     p_{j|i} = \dfrac{e^{-\frac{\|x_i - x_j\|^2}{2 \sigma_i^2}}}{\sum_{k \neq i} e^{-\frac{\|x_i - x_k\|^2}{2 \sigma_i^2}}}
 \end{equation*}
+Dividing by the sum ensures that the sum of all probabilities is 1. \\
 For each distribution $p_{j|i}$, we define the \textbf{perplexity}:
 \begin{equation*}
     \textit{perp}(p_{j|i}) = 2^{H(p_{j|i})} \,,
@@ -101,14 +102,14 @@ The objective of SNE can be defined as: given a dataset $x_1, \dots, x_n \in R^m
 \begin{equation*}
     q_{j|i} = \dfrac{e^{-\|y_i - y_j\|^2}}{\sum_{k \neq i} e^{-\|y_i - y_k\|^2}}
 \end{equation*}
-is optimized to be the closest possible to $p$, minimizing the \textbf{KL-divergence}. KL-divergence measures the distance between two distributions $P$ and $Q$, and is used to define the cost function:
+is optimized to be the closest possible to $p$, minimizing the \textbf{KL-divergence} (Kullback-Leibler divergence). KL-divergence measures the distance between two distributions $P$ and $Q$, and is used to define the cost function:
 \begin{equation*}
-    C = \sum_i KL(P_i | Q_i) = \sum_i \sum_j p_{j|i} \log(\frac{p_{j|i}}{q_{j|i}})
+    C = KL(P || Q) = \sum_i \sum_j p_{ij} \log(\frac{p_{ij}}{q_{ij}})
 \end{equation*}
 This is not a metric function, since it's not symmetric. It measures the penalty for using a wrong distribution, and is usually minimized using gradient descent. This is not a convex problem, so there's no guarantee an optimum will be reached, but multiple restarts can be done attempt at finding a good enough solution.
 
 The peculiarity of t-SNE is that for $Q$, instead of using a Gaussian distribution, it uses Student's t-distribution with one degree of freedom, which is a heavy tailed distribution:
 \begin{equation*}
-    q_{ij} = \dfrac{(1 + \|y_i - y_j\|^2)^{-1}}{\sum_{k \neq m} (1 + \|y_k - y_m\|^2)^{-1}}
+    q_{j|i} = \dfrac{(1 + \|y_i - y_j\|^2)^{-1}}{\sum_k \sum_{m \neq k} (1 + \|y_k - y_m\|^2)^{-1}}
 \end{equation*}
 This distribution helps to model dissimilarity among distant objects.

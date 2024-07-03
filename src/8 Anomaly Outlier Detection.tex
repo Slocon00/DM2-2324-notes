@@ -35,7 +35,7 @@ In practice, it applies a statistical test that depends on data distribution, pa
 
 \textbf{Grubb's Test} detects outliers in univariate data. It assumes a normal distribution. One outlier is detected at a time and removed from the dataset, using a statistical test: the null hypothesis $H_0$ is \textit{``there is no outlier in the dataset''}, while the alternative hypothesis $H_A$ is \textit{``there is at least one outlier in the dataset''}. The Grubb's test statistic is:
 \begin{equation*}
-    G = \dfrac{\max |X - \bar{X}|}{s} 
+    G = \dfrac{\max_{i=1\dots n} |X_i - \bar{X}|}{s} 
 \end{equation*}
 with $\bar{X}$ being the sample mean and $s$ the sample standard deviation of the data.
 The null hypothesis is rejected at significance level $\alpha$ if:
@@ -71,7 +71,7 @@ Define for each $I_j \subset I$ the \textbf{smoothing factor}:
 \end{equation*}
 Then, we say that $I_x \subset I$ is an \textbf{exception set} with respect to $D$ and $C$ if
 \begin{equation*}
-    SF(I_x) \geq SF(I_j) \forall I_j \subset I
+    SF(I_x) \geq SF(I_j) \ \forall I_j \subset I
 \end{equation*}
 Intuitively, the exception set contains all instances that contribute the most to the dissimilarity of the itemset $I$ with the least number of elements; in other words, its outliers. The smoothing factor indicates how much the dissimilarity can be reduced by removing the subset $I_j$ from $I$. 
 
@@ -133,11 +133,11 @@ An alternative is using the \textbf{Local Outlier Factor} (\textbf{LOF}). First,
 \end{equation*}
 then, each point is associated with its \textbf{local reachability distance}:
 \begin{equation*}
-    \textit{LRD}_k(p) = 1 / \dfrac{\sum_{o \in \textit{N}_k(p)} \textit{reach.-dist}_k(p,o)}{k}
+    \textit{LRD}_k(p) = 1 / \dfrac{\sum_{o \in N_k(p)} \textit{reach.-dist}_k(p,o)}{k}
 \end{equation*}
 Finally, the LOF is calculated as:
 \begin{equation*}
-    \textit{LOF}_{\textit{k}}(p) = \dfrac{\sum_{o \in N_{k(p)}} \textit{LRD}_{k(o)} / \textit{LRD}_{k(p)} }{k}
+    \textit{LOF}_{\textit{k}}(p) = \dfrac{\sum_{o \in N_{k(p)}} \textit{LRD}_k(o) / \textit{LRD}_k(p) }{k}
 \end{equation*}
 If a point's LOF is close to 1, then the point is inside a cluster, and if it is much greater than 1, it is an outlier. The result is influenced by the chosen $k$, but an increase in $k$ does not necessarily mean an increase in LOF.
 
@@ -145,12 +145,12 @@ If a point's LOF is close to 1, then the point is inside a cluster, and if it is
 
 Sometimes, in regions of low density, LOF may fail to detect outliers, unless we use a small $k$. However, using a too small $k$ may include outliers as normal points. A solution is using the \textbf{Connectivity-based Outlier Factor}. It uses \textbf{chaining distance} to calculate a point's nearest neighbor. The average chaining distance is calculated as:
 \begin{equation*}
-    \textit{ac-dist}_{N_{k(p)}}(p) = \sum_{i=1}^{k-1} \dfrac{2(r-i)}{r(r-1)} CDS_i
+    \textit{ac-dist}_{N_{k(p)}}(p) = \sum_{i=1}^{k} \dfrac{2(k+1-i)}{k(k+1)} CDS_i
 \end{equation*}
 where $k$ is the number of neighbors in $p$'s $k$-neighborhood, and $CDS_i$ is the cost description sequence of removing the $i^{th}$ neighbor. The chaining distance for a point can be seen as the minimum of the total sum of the distances linking all neighbors. In practice, it is calculated with a graph-like structure. \\
 The COF is then calculated as:
 \begin{equation*}
-    \textit{COF}_k(p) = \dfrac{|N_k(p)| \textit{ac-dist}_{N_{k(p)}}}{\sum_{o \in N_{k(p)}} \textit{ac-dist}_{N_{k(o)}}(o)}
+    \textit{COF}_k(p) = \dfrac{k \times \textit{ac-dist}_{N_{k(p)}}}{\sum_{o \in N_{k(p)}} \textit{ac-dist}_{N_{k(o)}}(o)}
 \end{equation*}
 
 \subsubsection{INFLuenced Outlierness (INFLO)}
@@ -229,7 +229,7 @@ This is a very coarse model: all the points within a cell with low sparsity are 
 
 Ensemble-based means that a group of methods is used on the same dataset, and the final result will be a combination of their singular outcomes. For outlier detection, \textbf{feature bagging} (\textbf{FeaBag}) is used: a set of different outlier detection methods is selected, and each of them is applied on a random set of features selected from the original feature space. Each method will identify different outliers, assigning them outlier scores. The average of those scores is then returned for each point.
 
-An extension of histogram-based outlier score is \textbf{lightweight on-line detector of anomalies} \textbf{(LODA)}. It is especially useful in real-time scenarios where a big amount of records must be processed. LODA approximates the joint probability using a collection of one-dimensional histograms, each constructed on an input space projected onto a randomly generated vector. Even thoug one-dimensional histograms are weak outlier detection methods by themselves, their collection yields good results.
+An extension of histogram-based outlier score is \textbf{lightweight on-line detector of anomalies} \textbf{(LODA)}. It is especially useful in real-time scenarios where a big amount of records must be processed. LODA approximates the joint probability using a collection of one-dimensional histograms, each constructed on an input space projected onto a randomly generated vector. Even though one-dimensional histograms are weak outlier detection methods by themselves, their collection yields good results.
 
 \section{Model-based Approaches}
 
