@@ -1,6 +1,6 @@
 \chapter{Neural Networks}
 
-(Artificial) neural networks are a flexible machine learning tool, encompassing a wide set of models capable of approximating functions. They can learn from examples, are universal approximators (\href{https://en.wikipedia.org/wiki/Universal_approximation_theorem}{Cybenko's/Universal approximation Theorem}), can deal with noisy and/or incomplete data, and can handle both continuous real and discrete data.
+(Artificial) neural networks are a flexible machine learning tool, encompassing a wide set of models capable of approximating functions. They can learn both classification and regression tasks, are universal approximators (\href{https://en.wikipedia.org/wiki/Universal_approximation_theorem}{Cybenko's/Universal approximation Theorem}), and can handle both continuous real and discrete data.
 
 \section{Artificial Neurons}
 
@@ -108,6 +108,7 @@ As seen before, the possible activation functions can be a linear function, a th
             \end{cases}$
 
     \item \textbf{Softplus function}: $f(x) = ln(1+e^x)$
+    \item \textbf{Softmax function}: $f(x_i) = \dfrac{e^{x_i}}{\sum_j e^{x_j}}$
 \end{itemize}
 The derivative of the identity function is 1. The derivative of the threshold function is not defined, which is why it's not used in LMS. As for sigmoid functions:
 
@@ -142,12 +143,6 @@ A MLP can be seen in two possible ways: either as a network of units, or as a fl
 
     \item if the pattern $x$ is loaded in the input layer, the notation $o$ can be used for both inputs and hidden layer inputs, so, inside the network, the input to each unit $t$ from any source $u$ is simply denoted as $o_u$.
 \end{itemize}
-As a flexible function, the MLP can be written as a function in the following form:
-
-\begin{equation*}
-    h(x) = f_k(\sum_j w_{kj} f_j (\sum_i w_{ji} f_i(\dots))) \, ,
-\end{equation*}
-where $f_k$ is a sigmoid activation function.
 
 \subsection{Architecture}
 
@@ -163,26 +158,11 @@ The architecture of a NN defines the topology of the connections between units. 
 \end{enumerate}
 A \textbf{recurrent architecture} describes a network with feedback loops, which allow the output of units to go ``back'' in the network towards units in previous layers.
 
-\section{Flexibility of NNs}
-
-The hypothesis space of a NN is the continuous space of all the functions that can be represented by assigning the weight values of the given architecture. Depending on the class of values produced as output, the model can deal with both regression and classification tasks, by using, respectively, a linear function or a sigmoidal one. It can also implement multi-regression and multi-class classifiers by defining multiple output units. \\
-When we consider a NN as a function, so in the form
-\begin{equation*}
-    h(x) = f_k(\sum_j w_{kj} f_j (\sum_i w_{ji} f_i(\dots))) \, ,
-\end{equation*}
-each $f_j$ can be seen as computed by an independent unit, or a special kind of $\phi$ of Linear Basis Expansion. Additionally, $h(x)$ is non-linear in the parameters $w$. So, we can reformulate the function as follows:
-\begin{equation*}
-    h(x) = f_k(\sum_j w_{kj} f_j (\sum_i w_{ji} x_i)) = f(\sum_j w_j \phi_j(x,w))
-\end{equation*}
-The main difference with LBE is that the $\phi$ are adapted to data by fitting the $w$.
-
 \section{SGD and Backpropagation Learning Algorithm}
 
 The universal approximation theorem declares that single hidden-layer network (with logistic activation functions) can approximate (arbitrarily well) every continuous function, given enough units; a MLP network can approximate (arbitrarily well) every input-output mapping (provided enough units in the hidden layers), as well. Note that this theorem does not say which learning algorithm to use, nor the number of units needed. The expressive power of NN is strongly influenced by two aspects: the number of units (and in turn, the number of weights $w$), and the architecture. Another important aspect is the number of layers to use in the network. The universal approximation theorem tells us that 1 layer is sufficient to approximate any function, yet it gives no indication on the number of units to use, which may be incredibly high. So, instead of using only one layer, the network is split into multiple layers, each with a limited number of units.
 
 The most common learning algorithm used for NN is Stochastic Gradient Descent (LMS approach). The goal is to adapt the free parameters $w$ in order to obtain the best approximation of the target function. This is normally done by checking the value of the error (or loss) function calculated on the training set. In the case of NNs, however, this is not as straightforward: the network has multiple units across layers, so the learning algorithm must first decide how much credit to give to the hidden units in causing the error to increase.
-
-The so called \textbf{loading problem} is formulated as follows: given a network and a set of examples, is there a set of weights so that the network will be consistent with the examples? The problem is NP-complete, and while networks can in practice be trained in a reasonable amount of time, an optimal solution in not guaranteed.
 
 The idea behind the backpropagation algorithm solution is to extend the gradient descent approach, so it can be used with MLP networks as well. The things we need are:
 \begin{itemize}
@@ -196,13 +176,6 @@ What we want to find is $w$ obtained by computing the gradient of the error func
     \item it keeps track of the quantities local to each unit;
     \item it's efficient, since it's $O(\#W)$ rather than $O(\#W^2)$
     \item supposedly, the brain's learning ``algorithm'' is a local sub optimal approximation of backpropagation (although this debate remains controversial).
-\end{itemize}
-
-Some commonly used optimization algorithms for Gradient Descent are:
-\begin{itemize}
-    \item RMSprop, which adapts the learning rate by reducing it using a moving average of the squared gradient;
-    \item Adagrad, similar to RMSProp but with element-wise scaling of the gradient;
-    \item Adam, which adds an exponentially decaying average of past gradients (like momentum in SGD).
 \end{itemize}
 
 \subsection{Issues in Training NNs}
@@ -269,7 +242,13 @@ In a practical approach, it's useful to consider the mean of the gradients over 
     \end{equation*}
     and then stop for some iteration, from which we can use a fixed small value of $\eta$. Ideally, the final value of $\eta$ should be $\sim 1\%$ of $\eta_0$, so it takes a few hundred steps to reach it.
     
-    \item Adaptive learning rates (changed during training and for each $w$): automatically adapt the learning rate during training, avoiding or reducing the fine tuning phase via hyperparameter selection. Some popular ones include AdaGrad, RMSProp, Adam. Can be combined with momentum.
+    \item Adaptive learning rates (changed during training and for each $w$): automatically adapt the learning rate during training, avoiding or reducing the fine tuning phase via hyperparameter selection. Some popular ones include:  
+    \begin{itemize}
+        \item RMSprop, which adapts the learning rate by reducing it using a moving average of the squared gradient;
+        \item Adagrad, similar to RMSProp but with element-wise scaling of the gradient;
+        \item Adam, which adds an exponentially decaying average of past gradients (like momentum in SGD).
+    \end{itemize}
+    Can be combined with momentum.
     
     \item Varying in NNs with many layers (higher for deep layers, or higher for units with few input connections).
 \end{itemize}
@@ -280,7 +259,7 @@ The number of units controls the complexity of the NN. This choice is in general
 
 \subsubsection{Multiple Minima}
 
-Loss in no longer convex. The function may have multiple minima, as well as maxima. The final result depends a lot on the starting weight values. Ideally, we should try a number of random starting configurations (trials), and then take the mean result (as in, the mean of errors) and check the variance in order to evaluate the model. Then, we can either pick the solution that produces the lowest/median validation error, or we can consider the mean of the outputs.
+Loss is not convex. The function may have multiple minima, as well as maxima. The final result depends a lot on the starting weight values. Ideally, we should try a number of random starting configurations (trials), and then take the mean result (as in, the mean of errors) and check the variance in order to evaluate the model. Then, we can either pick the solution that produces the lowest/median validation error, or we can consider the mean of the outputs.
 
 It's worth noting that finding a local minima with too high error that stops training is not a big issue, since we can always check the final training error (and restart if needed). In general, we don't need to find the global minimum, a ``good'' local minima is sufficient. This is because the minimum we find is of $R_{emp}$, not $R$ (which is what we want to approximate). Also, instead of finding a point corresponding to the null gradient, we may want to stop at a point that has sufficiently small gradient.
 
@@ -318,11 +297,7 @@ Note, also, that the bias $w_0$ is often omitted from the regularizer, since its
 
 Preprocessing of the data can have a large effect on the result of training. Data should be normalized via either standardization (each feature is modified so that mean is 0 and standard deviation is 1), or rescaling (the range of values is restricted to [0,1]).
 
-For regression, there's one or more output linear units; for classification, there's either a singular binary output unit, or there's multiple binary units. In the latter case, we can use a sigmoid to choose the threshold to assign the class, a rejection zone, or 1-to-K encoding to choose the ``winner'' class. Often, the symmetric logistic function learns faster. To avoid asymptotic convergence, 0.9 and 0.1 can be used instead of 1 an 0 as a label value (for the logistic function, for the tanh function -0.9 is used instead of -1). In any case, the target range must be in the output range of units. If targets are 0/1, it's common to use the Softmax function:
-\begin{equation*}
-    o_k(x) = \dfrac{e^{(-net_k)}}{\sum_{j=1}^Ke^{(-net_j)}}
-\end{equation*}
-Or the (binary) cross entropy:
+For regression, there's one or more output linear units; for classification, there's either a singular binary output unit, or there's multiple binary units. In the latter case, we can use a sigmoid to choose the threshold to assign the class, a rejection zone, or 1-to-K encoding to choose the ``winner'' class. Often, the symmetric logistic function learns faster. To avoid asymptotic convergence, 0.9 and 0.1 can be used instead of 1 an 0 as a label value (for the logistic function, for the tanh function -0.9 is used instead of -1). In any case, the target range must be in the output range of units. If targets are 0/1, it's common to use the Softmax function, or the (binary) cross entropy:
 \begin{equation*}
    E(w) = - \sum_{i \in TR} \{ d_i \log (out(x_i)) + (1-d_i) \log(1-out(x_i)) \}
 \end{equation*}
