@@ -42,7 +42,7 @@ An alternative to SMOTE is \textbf{ADASYN} (ADAptive SYNthetic). This algorithm 
 \begin{enumerate}
     \item The ratio of min to maj class examples is calculated as $d = \#\textit{min}/\#\textit{maj}$.
 
-    \item The total number of synthetic minority class examples as $G = (\#\textit{maj} - \#\textit{min}) / \beta$, where $\beta$ is the desired ratio of minority.
+    \item The total number of synthetic minority class examples as $G = (\#\textit{maj} - \#\textit{min})*\beta$, where $\beta$ is the desired ratio of minority.
 
     \item The $k$-NN of each minority sample is found, and the ratio of majority class examples is found for that neighborhood as $r_i = \#\textit{maj}_i / k$; this ratio is then normalized by dividing it by the sum of all the $r_i$.
 
