@@ -78,7 +78,7 @@ A default choice of models used by AdaBoost is \textbf{decision stumps}, a decis
 
 The goal of gradient boosting is to find the best hypothesis by expanding a starting function. In the case of regression, the functions are:
 \begin{align*}
-    &F_0(x) = \arg \min_{\gamma} \sum_{i=1}^n L(y_i, \gamma) = \mathrm{E}[y] \\
+    &F_0(x) = \arg \min_{\gamma} \sum_{i=1}^n L(y_i, \gamma) = \mathbb{E}[y] \\
     &F_m(x) = F_{m-1}(x) + \left ( \arg \min_{h_m \in H} \sum_{i=1}^n L(y_i, F_{m-1}(x_i) + h_m(x_i)) \right ) (x)
 \end{align*}
 where $h_m$ is a base learner function, and the loss function is usually Squared Error Loss.
